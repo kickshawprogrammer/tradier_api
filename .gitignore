@@ -1,0 +1,19 @@
+__pycache__/
+.vscode/
+testdata/
+
+did.bin
+output.html
+_log_setup.py
+_secrets.py
+_sandbox.py
+sandbox/
+retired/
+.coverage
+tradier_api.log
+
+# ignore all data/ directories
+data/
+
+# Except the src/data/ 
+!src/data/
