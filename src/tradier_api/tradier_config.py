@@ -78,3 +78,10 @@ class TradierConfig:
         
         self._accept_application = f"application/{content_type.lower()}"
         self.headers = self._build_headers()  # Rebuild headers on change
+
+class SandboxConfig(TradierConfig):
+    def __init__(self, token: str):
+        super().__init__(token, APIEnv.SANDBOX)
+
+LiveConfig = TradierConfig
+PaperConfig = SandboxConfig

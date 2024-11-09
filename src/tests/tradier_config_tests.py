@@ -1,7 +1,7 @@
 import unittest
 from typing import Dict
 
-from tradier_api import TradierConfig, APIEnv
+from tradier_api import TradierConfig, APIEnv, SandboxConfig, LiveConfig, PaperConfig
 
 class TestTradierConfig(unittest.TestCase):
     def setUp(self):
@@ -63,3 +63,27 @@ class TestTradierConfig(unittest.TestCase):
         config = TradierConfig(token=self.token)
         with self.assertRaises(TypeError):
             config._validate_environment(123)  # type: ignore - intentionally passing an int to trigger TypeError
+
+    def test_sandbox_config_environment(self):
+        sandbox_config = SandboxConfig(token=self.token)
+        self.assertEqual(sandbox_config.environment, APIEnv.SANDBOX)
+        self.assertEqual(sandbox_config.token, self.token)
+
+    def test_live_config_environment(self):
+        live_config = LiveConfig(token=self.token)
+        self.assertEqual(live_config.environment, APIEnv.LIVE)
+        self.assertEqual(live_config.token, self.token)
+
+    def test_paper_config_alias(self):
+        paper_config = PaperConfig(token=self.token)
+        self.assertEqual(paper_config.environment, APIEnv.SANDBOX)  # Paper should map to Sandbox
+        self.assertEqual(paper_config.token, self.token)
+
+    def test_headers_consistency_in_variants(self):
+        sandbox_config = SandboxConfig(token=self.token)
+        live_config = LiveConfig(token=self.token)
+        paper_config = PaperConfig(token=self.token)
+
+        self.assertEqual(sandbox_config.headers["Authorization"], f"Bearer {self.token}")
+        self.assertEqual(live_config.headers["Authorization"], f"Bearer {self.token}")
+        self.assertEqual(paper_config.headers["Authorization"], f"Bearer {self.token}")
