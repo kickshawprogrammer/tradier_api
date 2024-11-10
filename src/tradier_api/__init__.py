@@ -1,6 +1,7 @@
 import logging
 
-from .tradier_types import TradierAPIException, EndPoints, WebSocketEndpoints, ExchangeCode
+from .tradier_types import TradierAPIException, Endpoints, WebSocketEndpoints, ExchangeCode
+from .tradier_params import BaseParams, AccountParams, OrderParams, WatchlistParams
 from .tradier_config import APIEnv, TradierConfig, SandboxConfig, LiveConfig, PaperConfig
 from .tradier_controllers import TradierBaseController, TradierApiController, TradierWebsocketController
 
@@ -19,9 +20,15 @@ __all__ = [
 
     # tradier_types.py
     "TradierAPIException",
-    "EndPoints",
+    "Endpoints",
     "WebSocketEndpoints",
     "ExchangeCode",
+
+    # tradier_params.py
+    "BaseParams",
+    "AccountParams",
+    "OrderParams",
+    "WatchlistParams",
 
     # tradier_controllers.py
     "TradierBaseController",

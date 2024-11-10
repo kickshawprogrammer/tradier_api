@@ -8,6 +8,8 @@ API, as well as other types that can be used to define API requests and response
 Internal implementation details are defined in `_core_definitions.py` and should \
 not be used directly by external callers.
 """
+import re
+
 from enum import Enum
 
 from ._core_types import ApiPaths
@@ -19,7 +21,7 @@ class TradierAPIException(Exception):
         self.message = message
         super().__init__(f"Status {status_code}: {message}")
 
-class EndPoints(Enum):
+class Endpoints(Enum):
     """Publicly accessible API endpoints for the Tradier API."""
     
     # Authentication
@@ -93,7 +95,26 @@ class EndPoints(Enum):
     def path(self) -> str:
         """Returns the URL path as a string."""
         return self.value[1].value
+    
+    def format_path(self, **path_params) -> str:
+        """Formats the endpoint path by filling placeholders with provided parameters in order."""
+        # Find all placeholders in the path (e.g., {account_id}, {order_id})
+        placeholders = re.findall(r"\{(.*?)\}", self.path)
+        
+        # Ensure the number of provided parameters matches the placeholders
+        if len(placeholders) != len(path_params):
+            raise ValueError(f"{self.name} requires {len(placeholders)} parameters, but {len(path_params)} were provided.")
 
+        # Use only the values in the provided order
+        values = list(path_params.values())
+        
+        # Replace placeholders with corresponding values from path_params
+        formatted_path = self.path
+        for placeholder, value in zip(placeholders, values):
+            formatted_path = formatted_path.replace(f"{{{placeholder}}}", str(value))
+
+        return formatted_path
+    
 class WebSocketEndpoints(Enum):
     """Public WebSocket API endpoints for Tradier."""
     STREAM_MARKET_EVENTS = ApiPaths.GET_STREAMING_MARKET_EVENTS.value

@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 
 import requests
 
-from tradier_api import TradierApiController, TradierAPIException, EndPoints
+from tradier_api import TradierApiController, TradierAPIException, Endpoints
 
 class TestTradierApiController(unittest.TestCase):
 
@@ -20,7 +20,7 @@ class TestTradierApiController(unittest.TestCase):
         mock_response.json.return_value = {"data": "valid_data"}
         mock_request.return_value = mock_response
 
-        result = self.api_controller.make_request(EndPoints.GET_QUOTES)
+        result = self.api_controller.make_request(Endpoints.GET_QUOTES)
         self.assertEqual(result, {"data": "valid_data"})
 
     @patch('requests.request')
@@ -31,7 +31,7 @@ class TestTradierApiController(unittest.TestCase):
         mock_request.return_value = mock_response
 
         with self.assertRaises(requests.exceptions.HTTPError):
-            self.api_controller.make_request(EndPoints.GET_QUOTES)
+            self.api_controller.make_request(Endpoints.GET_QUOTES)
 
     @patch('requests.request')
     def test_make_request_api_specific_error(self, mock_request):
@@ -41,7 +41,7 @@ class TestTradierApiController(unittest.TestCase):
         mock_request.return_value = mock_response
 
         with self.assertRaises(TradierAPIException) as context:
-            self.api_controller.make_request(EndPoints.GET_QUOTES)
+            self.api_controller.make_request(Endpoints.GET_QUOTES)
         self.assertEqual(str(context.exception.message), "API-specific error")
 
     @patch('requests.request')
@@ -51,7 +51,7 @@ class TestTradierApiController(unittest.TestCase):
         mock_request.side_effect = original_exception
 
         with self.assertRaises(Exception) as context:
-            self.api_controller.make_request(EndPoints.GET_QUOTES)
+            self.api_controller.make_request(Endpoints.GET_QUOTES)
 
         # Verify the custom error message includes the base URL and the message of the original exception
         self.assertIn("Error making request to", str(context.exception))

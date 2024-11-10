@@ -4,7 +4,8 @@ import requests
 from typing import Dict, Any, Optional
 
 from ._core_types import BaseURL as Base
-from .tradier_types import TradierAPIException, EndPoints
+from .tradier_types import TradierAPIException, Endpoints
+from .tradier_params import BaseParams
 from .tradier_config import TradierConfig
 
 import logging
@@ -17,6 +18,7 @@ class TradierBaseController:
         self.headers = config.headers
 
     def _get_base_url(self, environment: str) -> str:
+        environment = environment.lower()
         if environment == "live":
             return Base.API.value
         elif environment == "sandbox" or environment == "paper":
@@ -76,21 +78,26 @@ class TradierApiController(TradierBaseController):
     def __init__(self, config: TradierConfig):
         super().__init__(config)
 
-    def make_request(self, endpoint: EndPoints, params: Optional[Dict[str, Any]] = None) -> Any:
+    def make_request(self, endpoint: Endpoints, path_params: Optional[BaseParams] = None, query_params: Optional[Dict[str, Any]] = None) -> Any:
         """Makes a request to the Tradier API with the given endpoint and parameters."""
-        url = self._build_url(endpoint.path)
-        headers = self.config.headers
+        
+        # Convert path parameters to dictionary and format the URL
+        formatted_path = endpoint.format_path(**(path_params.to_query_params() if path_params else {}))
+        url = self._build_url(formatted_path)
+        
+        # Combine query parameters if provided
+        final_query_params = query_params or {}
 
         try:
-            # Using requests.request to handle various HTTP methods cleanly
             response = requests.request(
                 method=endpoint.method,
                 url=url,
-                headers=headers,
-                params=params if endpoint.method in ["GET", "DELETE"] else None,
-                data=params if endpoint.method in ["POST", "PUT"] else None
+                headers=self.headers,
+                params=final_query_params if endpoint.method in ["GET", "DELETE"] else None,
+                data=final_query_params if endpoint.method in ["POST", "PUT"] else None
             )
 
+            # Error and throttling handling
             self.ApiErrorHandler.handle_errors(response)
             self.ThrottleHandler.handle_throttling(response)
 

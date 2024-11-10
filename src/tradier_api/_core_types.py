@@ -51,11 +51,12 @@ class ApiPaths(Enum):
     GET_HISTORY = ACCOUNTS_BASE + "/history"             # GET
     GET_GAINLOSS = ACCOUNTS_BASE + "/gainloss"           # GET
     GET_ORDERS = ORDERS_BASE                             # GET
-    GET_AN_ORDER = ORDERS_BASE + "/{order_id}"           # GET
+    ORDERS_APPLY_ID = "/{order_id}"
+    GET_AN_ORDER = ORDERS_BASE + ORDERS_APPLY_ID           # GET
 
     # Trade endpoints
-    MODIFY_ORDER = ORDERS_BASE + "/{order_id}"           # PUT
-    CANCEL_ORDER = ORDERS_BASE + "/{order_id}"           # DELETE
+    MODIFY_ORDER = ORDERS_BASE + ORDERS_APPLY_ID         # PUT
+    CANCEL_ORDER = ORDERS_BASE + ORDERS_APPLY_ID         # DELETE
     PLACE_ORDER = ORDERS_BASE                            # POST
     PLACE_EQUITY_ORDER = PLACE_ORDER                     # POST
     PLACE_OPTION_ORDER = PLACE_ORDER                     # POST
@@ -98,10 +99,12 @@ class ApiPaths(Enum):
     GET_STREAMING_ACCOUNT_EVENTS = ACCOUNTS_BASE + "/events"    # ws
 
     # Watchlist endpoints
-    GET_WATCHLISTS = WATCHLISTS_BASE                            # GET
-    GET_WATCHLIST = WATCHLISTS_BASE + "/{watchlist_id}"         # GET
-    CREATE_WATCHLIST = WATCHLISTS_BASE                          # POST
-    UPDATE_WATCHLIST = GET_WATCHLIST                            # PUT
-    DELETE_WATCHLIST = GET_WATCHLIST                            # DELETE
-    ADD_WATCHLIST_SYMBOL = GET_WATCHLIST                        # POST
-    DELETE_WATCHLIST_SYMBOL = GET_WATCHLIST                     # DELETE
+    GET_WATCHLISTS = WATCHLISTS_BASE                                 # GET
+    GET_WATCHLIST = WATCHLISTS_BASE + "/{watchlist_id}"              # GET
+    WATCHLIST_APPLY_SYMBOL = "/symbols/{symbol_id}"
+    CREATE_WATCHLIST = WATCHLISTS_BASE                               # POST
+    UPDATE_WATCHLIST = GET_WATCHLIST                                 # PUT
+    DELETE_WATCHLIST = GET_WATCHLIST                                 # DELETE
+    ADD_WATCHLIST_SYMBOL = GET_WATCHLIST + WATCHLIST_APPLY_SYMBOL    # POST
+    DELETE_WATCHLIST_SYMBOL = GET_WATCHLIST + WATCHLIST_APPLY_SYMBOL # DELETE
+
