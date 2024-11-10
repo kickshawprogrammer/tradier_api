@@ -3,7 +3,8 @@ from unittest.mock import patch, MagicMock
 
 import requests
 
-from tradier_api import TradierApiController, TradierAPIException, Endpoints
+from tradier_api import TradierConfig, TradierApiController, TradierAPIException, Endpoints, APIEnv
+from tradier_api._core_types import BaseURL
 
 class TestTradierApiController(unittest.TestCase):
 
@@ -12,6 +13,7 @@ class TestTradierApiController(unittest.TestCase):
         config.environment.value = "live"
         config.headers = {"Authorization": "Bearer test_token"}
         self.api_controller = TradierApiController(config)
+        self.token = "test_token"
 
     @patch('requests.request')
     def test_make_request_successful(self, mock_request):
@@ -60,3 +62,24 @@ class TestTradierApiController(unittest.TestCase):
         # Confirm that the original exception is chained as the cause
         self.assertIs(context.exception.__cause__, original_exception)
         
+    def test_api_env_base_url(self):
+        """Test that each APIEnv setting configures the correct base URL."""
+        test_cases = [
+            (APIEnv.LIVE, BaseURL.API.value),
+            (APIEnv.SANDBOX, BaseURL.SANDBOX.value),
+            (APIEnv.STREAM, BaseURL.STREAM.value),
+            (APIEnv.WEBSOCKET, BaseURL.WEBSOCKET.value),
+            (APIEnv.PAPER, BaseURL.SANDBOX.value)
+        ]
+        
+        for env_setting, expected_base_url in test_cases:
+            with self.subTest(env_setting=env_setting):
+                # Set up the config with each environment
+                config = TradierConfig(token=self.token, environment=env_setting)
+                
+                # Initialize TradierBaseController with the given config
+                controller = TradierApiController(config)
+                
+                # Assert the base URL matches the expected value
+                self.assertEqual(controller.base_url, expected_base_url,
+                                 f"Failed for environment {env_setting}")        

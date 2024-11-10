@@ -1,6 +1,10 @@
 import time
 import requests
+import threading
+import asyncio
+import websockets
 
+from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
 from ._core_types import BaseURL as Base
@@ -23,6 +27,10 @@ class TradierBaseController:
             return Base.API.value
         elif environment == "sandbox" or environment == "paper":
             return Base.SANDBOX.value
+        elif environment == "stream":
+            return Base.STREAM.value
+        elif environment == "websocket":
+            return Base.WEBSOCKET.value
         else:
             raise ValueError(f"Invalid environment: {environment}")
         
@@ -112,7 +120,113 @@ class TradierApiController(TradierBaseController):
         except Exception as e:
             raise Exception(f"Error making request to {url}: {str(e)}") from e
     
-class TradierWebsocketController(TradierBaseController):
-    def __init__(self, config: TradierConfig):
+class TradierStreamController(TradierApiController, ABC):
+    def __init__(self, config, on_open=None, on_message=None, on_close=None, on_error=None):
         super().__init__(config)
+        self.session_key = None
+        self.on_open = on_open
+        self.on_message = on_message
+        self.on_close = on_close
+        self.on_error = on_error
 
+    def _handle_event(self, callback, default_message, *args):
+        """Handles event with given callback, defaulting to a message if callback is None."""
+        if callback:
+            callback(*args)
+        else:
+            print(default_message, *args)
+
+    def _do_on_open(self):
+        """Triggers the on_open event."""
+        self._handle_event(self.on_open, "Stream opened.")
+
+    def _do_on_message(self, message):
+        """Triggers the on_message event with message content."""
+        self._handle_event(self.on_message, "Received message:", message)
+
+    def _do_on_close(self):
+        """Triggers the on_close event."""
+        self._handle_event(self.on_close, "Stream closed.")
+
+    def _do_on_error(self, error):
+        """Triggers the on_error event with error details."""
+        self._handle_event(self.on_error, "Stream error:", error)
+
+    def create_session(self):
+        """Creates a session and retrieves the session key."""
+        response = self.make_request(Endpoints.CREATE_MARKET_SESSION)
+        self.session_key = response.json().get("stream", {}).get("sessionid")
+        if not self.session_key:
+            raise ValueError("Failed to retrieve session key.")
+        print(f"Session key acquired: {self.session_key}")
+
+    @abstractmethod
+    def start(self):
+        pass
+
+    @abstractmethod
+    def close(self):
+        pass
+
+class TradierHttpStreamController(TradierStreamController):
+    def __init__(self, config, on_open=None, on_message=None, on_close=None, on_error=None):
+        super().__init__(config, on_open, on_message, on_close, on_error)
+        self._stop_event = threading.Event()
+        self._thread = None
+
+    def start(self, symbols):
+        """Starts the HTTP streaming connection in a new thread."""
+        if not self.session_key:
+            self.create_session()  # Ensures a session is created before streaming
+
+        # Set up a new thread for streaming
+        self._thread = threading.Thread(target=self._run_stream, args=(symbols,))
+        self._thread.start()
+
+    def _run_stream(self, symbols):
+        """Executes the streaming logic in a separate thread."""
+        self._do_on_open()
+
+        # Build URL and set up parameters for streaming
+        url = self._build_url(Endpoints.GET_STREAMING_QUOTES.path)
+        headers = {**self.config.headers, "Session-Key": self.session_key}
+        params = {"symbols": ",".join(symbols)}
+
+        try:
+            # Initiate streaming with requests.get, using stream=True for continuous data
+            response = requests.get(url, headers=headers, params=params, stream=True)
+            self.ApiErrorHandler.handle_errors(response)
+            self.ThrottleHandler.handle_throttling(response)
+
+            # Process each incoming chunk of data
+            try:
+                for chunk in response.iter_lines():
+                    if self._stop_event.is_set():
+                        break
+                    if chunk:
+                        self._do_on_message(chunk.decode('utf-8'))
+            except requests.exceptions.RequestException as e:
+                self._do_on_error(e)  # Handle streaming-specific errors
+
+        except requests.exceptions.RequestException as e:
+            self._do_on_error(e)  # Handle setup errors
+        finally:
+            self._do_on_close()
+
+    def close(self):
+        """Signals the stream to stop and waits for the thread to exit."""
+        if self._thread is not None:
+            self._stop_event.set()
+            self._thread.join()
+            self._thread = None
+        print("Streaming closed.")
+
+
+# class TradierWebsocketController(TradierStreamController):
+#     async def start(self):
+#         """Starts the WebSocket streaming connection, ensuring session is created."""
+#         pass
+
+#     def close(self):
+#         """Handle WebSocket stream closure if needed."""
+#         pass

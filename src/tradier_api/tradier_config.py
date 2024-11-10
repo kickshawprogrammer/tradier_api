@@ -12,7 +12,11 @@ class APIEnv(Enum):
     """
     LIVE = "live"
     SANDBOX = "sandbox"
-    PAPER = "sandbox"  # Alias to Sandbox
+    STREAM = "stream"
+    WEBSOCKET = "websocket"
+    
+    # Alias to Sandbox
+    PAPER = "sandbox"  
 
 class TradierConfig:
     """
