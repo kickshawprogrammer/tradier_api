@@ -85,8 +85,7 @@ class TestTradierStreamController(unittest.TestCase):
         """Test create_session with a mocked API response."""
         # Mock the response object from requests.get
         mock_response = Mock()
-        mock_response.json.return_value = {"stream":{"sessionid": "mock_session_key"}}
-        mock_get.return_value = mock_response
+        mock_get.return_value = {"stream":{"sessionid": "mock_session_key"}}
 
         # Run create_session and verify the session_key is set
         self.controller.create_session()
@@ -97,8 +96,8 @@ class TestTradierStreamController(unittest.TestCase):
     def test_create_session_failed_to_create_session_key(self, mock_get):
         """Test that session_key remains None if create_session is not set with a value."""
         mock_response = Mock()
-        mock_response.json.return_value = {}
-        mock_get.return_value = mock_response
+        mock_get.return_value = {}
 
         with self.assertRaises(Exception):
             self.controller.create_session()
+            

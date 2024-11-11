@@ -7,7 +7,7 @@ import websockets
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
-from ._core_types import BaseURL as Base
+from ._core_types import BaseURL
 from .tradier_types import TradierAPIException, Endpoints
 from .tradier_params import BaseParams
 from .tradier_config import TradierConfig
@@ -24,13 +24,9 @@ class TradierBaseController:
     def _get_base_url(self, environment: str) -> str:
         environment = environment.lower()
         if environment == "live":
-            return Base.API.value
+            return BaseURL.API.value
         elif environment == "sandbox" or environment == "paper":
-            return Base.SANDBOX.value
-        elif environment == "stream":
-            return Base.STREAM.value
-        elif environment == "websocket":
-            return Base.WEBSOCKET.value
+            return BaseURL.SANDBOX.value
         else:
             raise ValueError(f"Invalid environment: {environment}")
         
@@ -109,6 +105,7 @@ class TradierApiController(TradierBaseController):
             self.ApiErrorHandler.handle_errors(response)
             self.ThrottleHandler.handle_throttling(response)
 
+            print(f"Response status: {response.json()}")
             return response.json()
             
         except requests.exceptions.HTTPError as e:
@@ -155,7 +152,7 @@ class TradierStreamController(TradierApiController, ABC):
     def create_session(self):
         """Creates a session and retrieves the session key."""
         response = self.make_request(Endpoints.CREATE_MARKET_SESSION)
-        self.session_key = response.json().get("stream", {}).get("sessionid")
+        self.session_key = response.get("stream", {}).get("sessionid")
         if not self.session_key:
             raise ValueError("Failed to retrieve session key.")
         print(f"Session key acquired: {self.session_key}")
@@ -174,27 +171,24 @@ class TradierHttpStreamController(TradierStreamController):
         self._stop_event = threading.Event()
         self._thread = None
 
-    def start(self, symbols):
-        """Starts the HTTP streaming connection in a new thread."""
-        if not self.session_key:
-            self.create_session()  # Ensures a session is created before streaming
-
-        # Set up a new thread for streaming
-        self._thread = threading.Thread(target=self._run_stream, args=(symbols,))
-        self._thread.start()
+    def _build_stream_url(self, endpoint: str):
+        """
+        Builds the URL based on the base URL and endpoint.
+        """
+        return f"{BaseURL.STREAM.value}{endpoint}"
 
     def _run_stream(self, symbols):
         """Executes the streaming logic in a separate thread."""
         self._do_on_open()
 
         # Build URL and set up parameters for streaming
-        url = self._build_url(Endpoints.GET_STREAMING_QUOTES.path)
-        headers = {**self.config.headers, "Session-Key": self.session_key}
-        params = {"symbols": ",".join(symbols)}
+        url = self._build_stream_url(Endpoints.GET_STREAMING_QUOTES.path)
+        # headers = {**self.config.headers, "Session-Key": self.session_key}
+        params = {"symbols": ",".join(symbols), "sessionid": self.session_key}
 
         try:
             # Initiate streaming with requests.get, using stream=True for continuous data
-            response = requests.get(url, headers=headers, params=params, stream=True)
+            response = requests.get(url, headers=self.config.headers, params=params, stream=True)
             self.ApiErrorHandler.handle_errors(response)
             self.ThrottleHandler.handle_throttling(response)
 
@@ -212,6 +206,15 @@ class TradierHttpStreamController(TradierStreamController):
             self._do_on_error(e)  # Handle setup errors
         finally:
             self._do_on_close()
+    
+    def start(self, symbols):
+        """Starts the HTTP streaming connection in a new thread."""
+        if not self.session_key:
+            self.create_session()  # Ensures a session is created before streaming
+
+        # Set up a new thread for streaming
+        self._thread = threading.Thread(target=self._run_stream, args=(symbols,))
+        self._thread.start()
 
     def close(self):
         """Signals the stream to stop and waits for the thread to exit."""

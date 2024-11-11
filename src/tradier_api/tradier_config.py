@@ -12,8 +12,6 @@ class APIEnv(Enum):
     """
     LIVE = "live"
     SANDBOX = "sandbox"
-    STREAM = "stream"
-    WEBSOCKET = "websocket"
     
     # Alias to Sandbox
     PAPER = "sandbox"  

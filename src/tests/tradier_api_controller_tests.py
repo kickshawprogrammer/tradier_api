@@ -67,8 +67,6 @@ class TestTradierApiController(unittest.TestCase):
         test_cases = [
             (APIEnv.LIVE, BaseURL.API.value),
             (APIEnv.SANDBOX, BaseURL.SANDBOX.value),
-            (APIEnv.STREAM, BaseURL.STREAM.value),
-            (APIEnv.WEBSOCKET, BaseURL.WEBSOCKET.value),
             (APIEnv.PAPER, BaseURL.SANDBOX.value)
         ]
         
