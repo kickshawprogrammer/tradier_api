@@ -20,6 +20,12 @@ class TestTradierStreamController(unittest.TestCase):
         self.config = TradierConfig(token=self.token, environment="sandbox")
         self.controller = self.TestableTradierStreamController(config=self.config)
 
+    def tearDown(self) -> None:
+        self.controller.start()
+        self.controller.close()
+        return super().tearDown()
+        
+
     def test_on_open_callback(self):
         """Test that on_open callback is invoked if provided."""
         mock_on_open = Mock()

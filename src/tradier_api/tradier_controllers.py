@@ -125,7 +125,7 @@ class TradierStreamController(TradierApiController, ABC):
         self.on_message = on_message
         self.on_close = on_close
         self.on_error = on_error
-
+    
     def _handle_event(self, callback, default_message, *args):
         """Handles event with given callback, defaulting to a message if callback is None."""
         if callback:
@@ -169,7 +169,7 @@ class TradierHttpStreamController(TradierStreamController):
     def __init__(self, config, on_open=None, on_message=None, on_close=None, on_error=None):
         super().__init__(config, on_open, on_message, on_close, on_error)
         self._stop_event = threading.Event()
-        self._thread = None
+        self._thread: Optional[threading.Thread] = None
 
     def _build_stream_url(self, endpoint: str):
         """
@@ -183,27 +183,26 @@ class TradierHttpStreamController(TradierStreamController):
 
         # Build URL and set up parameters for streaming
         url = self._build_stream_url(Endpoints.GET_STREAMING_QUOTES.path)
-        # headers = {**self.config.headers, "Session-Key": self.session_key}
-        params = {"symbols": ",".join(symbols), "sessionid": self.session_key}
+        params = {"symbols": ",".join(symbols), "sessionid": self.session_key, "linebreak":True}
 
         try:
-            # Initiate streaming with requests.get, using stream=True for continuous data
-            response = requests.get(url, headers=self.config.headers, params=params, stream=True)
-            self.ApiErrorHandler.handle_errors(response)
-            self.ThrottleHandler.handle_throttling(response)
+            # Initiate streaming with requests.post, using stream=True for continuous data
+            response = requests.post(url, headers=self.config.headers, params=params, stream=True)
+            response.raise_for_status()
 
             # Process each incoming chunk of data
-            try:
-                for chunk in response.iter_lines():
-                    if self._stop_event.is_set():
-                        break
-                    if chunk:
+            for chunk in response.iter_lines():
+                if self._stop_event.is_set():
+                    break
+                if chunk:
+                    try:
                         self._do_on_message(chunk.decode('utf-8'))
-            except requests.exceptions.RequestException as e:
-                self._do_on_error(e)  # Handle streaming-specific errors
+                    except Exception as e: 
+                        self._do_on_error(e)  # Handle streaming-specific errors
 
-        except requests.exceptions.RequestException as e:
+        except (TradierAPIException, requests.exceptions.RequestException) as e:
             self._do_on_error(e)  # Handle setup errors
+        
         finally:
             self._do_on_close()
     
@@ -213,6 +212,7 @@ class TradierHttpStreamController(TradierStreamController):
             self.create_session()  # Ensures a session is created before streaming
 
         # Set up a new thread for streaming
+        self._stop_event.clear()
         self._thread = threading.Thread(target=self._run_stream, args=(symbols,))
         self._thread.start()
 
