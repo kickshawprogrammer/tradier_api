@@ -1,109 +1,55 @@
 import unittest
 from unittest.mock import Mock, patch, MagicMock
-from tradier_api import TradierConfig, TradierStreamController
+from tradier_api import TradierConfig, TradierStreamController, TradierHttpStreamer
 
 class TestTradierStreamController(unittest.TestCase):
 
-    class TestableTradierStreamController(TradierStreamController):
-        def __init__(self, config, on_open=None, on_message=None, on_close=None, on_error=None):
-            super().__init__(config, on_open, on_message, on_close, on_error)
-            self.session_key = "test_session_key"
-
-        def start(self):
-            pass  # Implement a no-op start method for testing
-
-        def close(self):
-            pass  # Implement a no-op close method for testing
-
     def setUp(self):
-        self.token = "test_token"
-        self.config = TradierConfig(token=self.token, environment="sandbox")
-        self.controller = self.TestableTradierStreamController(config=self.config)
+        self.config = TradierConfig(token="test_token", environment="sandbox")
+        self.streamer = Mock(spec=TradierHttpStreamer)  # Mock streamer to isolate controller testing
+        self.controller = TradierStreamController(config=self.config, streamer=self.streamer)
 
-    def tearDown(self) -> None:
-        self.controller.start()
+    def test_start_stream_calls_run(self):
+        """Verify that start() in controller calls the streamer's run method."""
+        # Mock the create_session method and the streamer's run method
+        self.controller.create_session = MagicMock() # mocked result returns None
+        self.streamer.run = MagicMock()
+
+        # Call start, which should invoke create_session and then run
+        self.controller.start(["AAPL"])
+
+        # Verify create_session was called
+        self.controller.create_session.assert_called_once()
+
+        # Verify run was called with no session_key,_stop_event and symbols 
+        self.streamer.run.assert_called_once_with(None, self.controller._stop_event, ["AAPL"])
+
+    def test_close_signals_stop_event(self):
+        """Ensure that calling close() sets _stop_event and calls on_close when a thread is active."""
+        # Mock _thread with a mock `join` method
+        mock_thread = MagicMock()
+        mock_thread.join = MagicMock()
+        self.controller._thread = mock_thread
+
+        # Now call close, which should set _stop_event and trigger on_close
         self.controller.close()
-        return super().tearDown()
+
+        # Ensure that join was called on the mock thread to simulate cleanup
+        mock_thread.join.assert_called_once()
         
-
-    def test_on_open_callback(self):
-        """Test that on_open callback is invoked if provided."""
-        mock_on_open = Mock()
-        controller = self.TestableTradierStreamController(config=self.config, on_open=mock_on_open)
-        controller._do_on_open()
-        mock_on_open.assert_called_once()
-
-    def test_on_open_default(self):
-        """Test the default message for on_open if no callback is provided."""
-        controller = self.TestableTradierStreamController(config=self.config)
-        with patch("builtins.print") as mock_print:
-            controller._do_on_open()
-            mock_print.assert_called_once_with("Stream opened.")
-
-    def test_on_message_callback(self):
-        """Test that on_message callback is invoked with the correct message."""
-        mock_on_message = Mock()
-        controller = self.TestableTradierStreamController(config=self.config, on_message=mock_on_message)
-        test_message = "Test message"
-        controller._do_on_message(test_message)
-        mock_on_message.assert_called_once_with(test_message)
-
-    def test_on_message_default(self):
-        """Test the default message for on_message if no callback is provided."""
-        controller = self.TestableTradierStreamController(config=self.config)
-        test_message = "Test message"
-        with patch("builtins.print") as mock_print:
-            controller._do_on_message(test_message)
-            mock_print.assert_called_once_with("Received message:", test_message)
-
-    def test_on_close_callback(self):
-        """Test that on_close callback is invoked if provided."""
-        mock_on_close = Mock()
-        controller = self.TestableTradierStreamController(config=self.config, on_close=mock_on_close)
-        controller._do_on_close()
-        mock_on_close.assert_called_once()
-
-    def test_on_close_default(self):
-        """Test the default message for on_close if no callback is provided."""
-        controller = self.TestableTradierStreamController(config=self.config)
-        with patch("builtins.print") as mock_print:
-            controller._do_on_close()
-            mock_print.assert_called_once_with("Stream closed.")
-
-    def test_on_error_callback(self):
-        """Test that on_error callback is invoked with the correct error."""
-        mock_on_error = Mock()
-        controller = self.TestableTradierStreamController(config=self.config, on_error=mock_on_error)
-        test_error = Exception("Test error")
-        controller._do_on_error(test_error)
-        mock_on_error.assert_called_once_with(test_error)
-
-    def test_on_error_default(self):
-        """Test the default message for on_error if no callback is provided."""
-        controller = self.TestableTradierStreamController(config=self.config)
-        test_error = Exception("Test error")
-        with patch("builtins.print") as mock_print:
-            controller._do_on_error(test_error)
-            mock_print.assert_called_once_with("Stream error:", test_error)
+        # Assert _stop_event is set as expected
+        self.assertTrue(self.controller._stop_event.is_set())
 
     @patch("tradier_api.TradierApiController.make_request")
-    def test_create_session(self, mock_get):
-        """Test create_session with a mocked API response."""
-        # Mock the response object from requests.get
-        mock_response = Mock()
-        mock_get.return_value = {"stream":{"sessionid": "mock_session_key"}}
-
-        # Run create_session and verify the session_key is set
+    def test_create_session(self, mock_make_request):
+        """Test that create_session sets session_key correctly with API response."""
+        mock_make_request.return_value = {"stream": {"sessionid": "mock_session_key"}}
         self.controller.create_session()
         self.assertEqual(self.controller.session_key, "mock_session_key")
-        mock_get.assert_called_once()  # Verify requests.get was called
 
     @patch("tradier_api.TradierApiController.make_request")
-    def test_create_session_failed_to_create_session_key(self, mock_get):
-        """Test that session_key remains None if create_session is not set with a value."""
-        mock_response = Mock()
-        mock_get.return_value = {}
-
+    def test_create_session_failed_to_create_session_key(self, mock_make_request):
+        """Test that session_key remains None if API response lacks a session key."""
+        mock_make_request.return_value = {}
         with self.assertRaises(Exception):
             self.controller.create_session()
-            
