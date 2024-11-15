@@ -32,7 +32,8 @@ class ApiPaths(Enum):
 
     # Base paths for parameterized URLs
     OAUTH_BASE = "/v1/oauth"
-    ACCOUNTS_BASE = "/v1/accounts/{account_id}"
+    ACCOUNTS = "/v1/accounts"
+    ACCOUNTS_BASE = ACCOUNTS + "/{account_id}"
     ORDERS_BASE = ACCOUNTS_BASE + "/orders"
     MARKETS_BASE = "/v1/markets"
     OPTIONS_BASE = MARKETS_BASE + "/options"
@@ -90,9 +91,11 @@ class ApiPaths(Enum):
     GET_PRICE_STATS = FUNDAMENTALS_BASE + "/statistics"         # GET
 
     # Streaming endpoints
-    CREATE_MARKET_SESSION = MARKETS_BASE + "/events/session"    # POST
-    CREATE_ACCOUNT_SESSION = ACCOUNTS_BASE + "/events/session"  # POST
-    GET_STREAMING_QUOTES = MARKETS_BASE + "/events"             # GET / POST
+    EVENTS="/events"
+    EVENTS_SESSION = EVENTS + "/session"
+    CREATE_MARKET_SESSION = MARKETS_BASE + EVENTS_SESSION    # POST
+    CREATE_ACCOUNT_SESSION = ACCOUNTS + EVENTS_SESSION       # POST
+    GET_STREAMING_QUOTES = MARKETS_BASE + EVENTS             # GET / POST
 
     # WebSocket endpoints
     GET_STREAMING_MARKET_EVENTS = MARKETS_BASE + "/events"      # ws

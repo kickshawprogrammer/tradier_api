@@ -46,7 +46,7 @@ class TestApiPathsUrlStructure(unittest.TestCase):
             Endpoints.GET_FINANCIAL_REPORTS: [],
             Endpoints.GET_PRICE_STATS: [],
             Endpoints.CREATE_MARKET_SESSION: [],
-            Endpoints.CREATE_ACCOUNT_SESSION: ["account_id"],
+            Endpoints.CREATE_ACCOUNT_SESSION: [],
             Endpoints.GET_STREAMING_QUOTES: [],
             Endpoints.GET_WATCHLISTS: [],
             Endpoints.GET_WATCHLIST: ["watchlist_id"],

@@ -58,3 +58,4 @@ class TestTradierHttpStreamer(unittest.TestCase):
         mock_on_message.assert_called_once_with("valid_chunk")
         mock_on_error.assert_called_once()
         self.assertIsInstance(mock_on_error.call_args[0][0], UnicodeDecodeError)
+

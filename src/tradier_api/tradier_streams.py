@@ -1,4 +1,9 @@
 import requests
+import asyncio
+import websockets
+
+from typing import Optional, Union, List
+from threading import Thread, Event
 
 from ._core_types import BaseURL
 from .tradier_types import TradierAPIException, Endpoints
@@ -82,3 +87,55 @@ class TradierHttpStreamer(TradierBaseStreamer):
         finally:
             self._do_on_close()
 
+class TradierWebsocketStreamer(TradierBaseStreamer):
+    def __init__(self, config, on_open=None, on_message=None, on_close=None, on_error=None):
+        super().__init__(config, on_open, on_message, on_close, on_error)
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._task: Optional[asyncio.Task] = None
+
+    def _build_stream_url(self, endpoint: str):
+        """Builds the WebSocket URL based on the endpoint."""
+        return f"{BaseURL.WEBSOCKET.value}{endpoint}"
+    
+    async def _run_stream(self, session_key: str, stop_event: Event, symbols: Union[str, List[str]]):
+        # Convert symbols list to comma-separated string if needed
+        if isinstance(symbols, list):
+            symbols = ",".join(symbols)
+
+        # WebSocket URL
+        url = self._build_stream_url(Endpoints.GET_STREAMING_MARKET_EVENTS.path)
+        payload = f'{{"symbols": ["{symbols}"], "sessionid": "{session_key}", "linebreak": true}}'
+
+        try:
+            websocket = await websockets.connect(url, ssl=True, compression=None)
+            await websocket.send(payload)
+            self._do_on_open()
+
+            while not stop_event.is_set():
+                try:
+                    message = await asyncio.wait_for(websocket.recv(), timeout=1.0)
+                    self._do_on_message(message)
+                except asyncio.TimeoutError:
+                    continue
+                except Exception as e:
+                    self._do_on_error(e)
+                    break
+            await websocket.close()
+
+        except Exception as e:
+            self._do_on_error(e)
+
+        finally:
+            self._do_on_close()
+
+    def run(self, session_key: str, stop_event: Event, symbols: Union[str, List[str]]):
+        """Run the WebSocket connection in the asyncio loop."""
+        self._loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self._loop)
+        self._task = self._loop.create_task(self._run_stream(session_key, stop_event, symbols))
+
+        try:
+            self._loop.run_until_complete(self._task)
+        finally:
+            self._loop.run_until_complete(self._loop.shutdown_asyncgens())
+            self._loop.close()
