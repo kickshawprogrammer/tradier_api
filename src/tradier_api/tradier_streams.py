@@ -1,6 +1,7 @@
 import requests
 import asyncio
 import websockets
+import json
 
 from typing import Optional, Union, List
 from threading import Thread, Event
@@ -99,13 +100,21 @@ class TradierWebsocketStreamer(TradierBaseStreamer):
     
     async def _run_stream(self, session_key: str, stop_event: Event, symbols: Union[str, List[str]]):
         # Convert symbols list to comma-separated string if needed
-        if isinstance(symbols, list):
-            symbols = ",".join(symbols)
+        # if isinstance(symbols, list):
+        #     symbols = ",".join(symbols)
+        if isinstance(symbols, str):
+            symbols = [s.strip() for s in symbols.split(",")]
 
         # WebSocket URL
         url = self._build_stream_url(Endpoints.GET_STREAMING_MARKET_EVENTS.path)
-        payload = f'{{"symbols": ["{symbols}"], "sessionid": "{session_key}", "linebreak": true}}'
 
+        # Correctly format the payload
+        payload = json.dumps({
+            "symbols": symbols,
+            "sessionid": session_key,
+            "linebreak": True
+        })
+        
         try:
             websocket = await websockets.connect(url, ssl=True, compression=None)
             await websocket.send(payload)

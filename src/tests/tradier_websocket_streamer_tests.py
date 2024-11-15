@@ -1,5 +1,6 @@
 import unittest
 import asyncio
+import json
 
 from threading import Event
 from unittest.mock import AsyncMock, Mock, patch
@@ -11,7 +12,8 @@ class TestTradierWebsocketStreamer(unittest.TestCase):
         self.token = "test_token"
         self.config = TradierConfig(token=self.token, environment="sandbox")
         self.stop_event = Event()
-        self.symbols = ["AAPL", "TSLA"]
+        self.symbols = ["SPY", "AAPL", "TSLA", "MSFT"]
+        self.session_key = "test_session_key"
 
         # Create a test instance of the WebSocket streamer
         self.streamer = TradierWebsocketStreamer(config=self.config)
@@ -109,3 +111,38 @@ class TestTradierWebsocketStreamer(unittest.TestCase):
 
         # Ensure on_close is called after handling the exception
         self.streamer.on_close.assert_called_once()
+
+    def test_payload_with_list(self):
+        """Ensure payload is correctly formatted when symbols is a list."""
+        symbols = ["SPY", "AAPL", "TSLA", "MSFT"]
+
+        payload = json.dumps({
+            "symbols": symbols,
+            "sessionid": self.session_key,
+            "linebreak": True
+        })
+
+        parsed_payload = json.loads(payload)
+
+        self.assertEqual(parsed_payload["symbols"], symbols)
+        self.assertEqual(parsed_payload["sessionid"], self.session_key)
+        self.assertTrue(parsed_payload["linebreak"])
+
+    def test_payload_with_comma_separated_string(self):
+        """Ensure payload is correctly formatted when symbols is a comma-separated string."""
+        symbols = "SPY,AAPL,TSLA,MSFT"
+
+        # Convert to list
+        symbols_list = [s.strip() for s in symbols.split(",")]
+
+        payload = json.dumps({
+            "symbols": symbols_list,
+            "sessionid": self.session_key,
+            "linebreak": True
+        })
+
+        parsed_payload = json.loads(payload)
+
+        self.assertEqual(parsed_payload["symbols"], ["SPY", "AAPL", "TSLA", "MSFT"])
+        self.assertEqual(parsed_payload["sessionid"], self.session_key)
+        self.assertTrue(parsed_payload["linebreak"])
