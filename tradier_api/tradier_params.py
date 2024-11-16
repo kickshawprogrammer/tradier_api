@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union, List, Dict, Any
 
 class BaseParams:
     def to_query_params(self) -> dict:
@@ -18,5 +18,46 @@ class OrderParams(BaseParams):
 
 class WatchlistParams(BaseParams):
     def __init__(self, watchlist_id: str, symbol: Optional[str] = None):
+        if watchlist_id is None or watchlist_id.strip() == "":
+            raise ValueError("Watchlist ID is required but was not provided.")
+        
         self.watchlist_id = watchlist_id
         self.symbol = symbol
+        
+class BaseParamWithNormalization(BaseParams):
+    def __init__(self, values: Union[List[str], str, None], key: str, required: bool = True):
+        """
+        Base class for parameter types that normalize list, string, or None inputs.
+
+        Args:
+            values (Union[List[str], str, None]): List of strings, a comma-separated string, or None.
+            key (str): The key to use for query parameter generation.
+            required (bool): Whether the values parameter is mandatory.
+        """
+        if values is None:
+            if required:
+                raise ValueError(f"{key} is required but was not provided.")
+            self.values = []
+        elif isinstance(values, str):
+            self.values = [v.strip() for v in values.split(",")]
+        elif isinstance(values, list):
+            self.values = values
+        else:
+            raise ValueError(f"{key} must be a list, a comma-separated string, or None.")
+        self.key = key
+
+    def to_query_params(self) -> Dict[str, Any]:
+        """Convert the normalized values to a query parameter dictionary."""
+        if not self.values:
+            return {}  # Return an empty dictionary if there are no values
+        return {self.key: ",".join(self.values)}
+
+class SymbolsParams(BaseParamWithNormalization):
+    def __init__(self, symbols: Union[List[str], str]):
+        if symbols is None or symbols == "" or (isinstance(symbols, list) and not symbols):
+            raise ValueError("Symbols must not be empty.")
+        super().__init__(values=symbols, key="symbols", required=True)
+
+class ExcludedAccountParams(BaseParamWithNormalization):
+    def __init__(self, account_ids: Union[List[str], str, None] = None):
+        super().__init__(values=account_ids, key="account_id", required=False)

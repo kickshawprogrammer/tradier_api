@@ -173,6 +173,7 @@ _sandbox.py
 sandbox/
 retired/
 .coverage
+.tkb
 tradier_api.log
 
 # ignore all data/ directories

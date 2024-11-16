@@ -1,4 +1,4 @@
-from tradier_api import LiveConfig, TradierStreamController, TradierMarketsStreamer, SymbolsParams
+from tradier_api import LiveConfig, TradierStreamController, TradierAccountStreamer, ExcludedAccountParams
 from _import_token import API_TOKEN as TRADIER_API_TOKEN
 
 def on_open():
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     try:
         # Initialize the API configuration and WebSocket streamer
         config = LiveConfig(token=TRADIER_API_TOKEN)
-        streamer = TradierMarketsStreamer(
+        streamer = TradierAccountStreamer(
             config=config,
             on_open=on_open,
             on_message=on_message,
@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
         # Initialize the stream controller
         controller = TradierStreamController(config=config, streamer=streamer)
-        params = SymbolsParams(symbols=["AAPL", "TSLA", "SPY"])
+        params = ExcludedAccountParams()
 
         # Start streaming data for specific symbols
         controller.start(params)

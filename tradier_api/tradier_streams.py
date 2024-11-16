@@ -3,11 +3,12 @@ import asyncio
 import websockets
 import json
 
-from typing import Optional, Union, List
+from typing import Optional, Union, List, cast
 from threading import Thread, Event
 
 from ._core_types import BaseURL
 from .tradier_types import TradierAPIException, Endpoints
+from .tradier_params import BaseParams, SymbolsParams, ExcludedAccountParams
 from .tradier_config import TradierConfig
 
 import logging
@@ -46,10 +47,13 @@ class TradierBaseStreamer:
         """Triggers the on_error event with error details."""
         self._handle_event(self.on_error, "Stream error:", error)
 
-    def run(self, session_key, stop_event, symbols):
+    def run(self, session_key, stop_event, params: BaseParams):
         """Runs the stream logic in a separate thread."""
         raise NotImplementedError
-
+    
+    def get_session_endpoint(self) -> Endpoints:
+        """Returns the appropriate session endpoint for the streamer."""
+        raise NotImplementedError
 
 class TradierHttpStreamer(TradierBaseStreamer):
     """HTTP streamer class for handling HTTP streaming requests."""
@@ -58,33 +62,38 @@ class TradierHttpStreamer(TradierBaseStreamer):
         Builds the URL based on the base URL and endpoint.
         """
         return f"{BaseURL.STREAM.value}{endpoint}"
+    
+    def get_session_endpoint(self) -> Endpoints:
+        return Endpoints.CREATE_MARKET_SESSION
 
-    def run(self, session_key, stop_event, symbols):
-        """Executes the streaming logic in a separate thread."""
+    def run(self, session_key: str, stop_event: Event, params: BaseParams):
+        """Executes the streaming logic using provided parameters."""
+        if not isinstance(params, SymbolsParams):
+            raise ValueError("Invalid parameters for TradierHttpStreamer. Expected SymbolsParams.")
+
         try:
             self._do_on_open()
 
-            # Build URL and set up parameters for streaming
             url = self._build_stream_url(Endpoints.GET_STREAMING_QUOTES.path)
-            params = {"symbols": ",".join(symbols), "sessionid": session_key, "linebreak":True}
-    
-            # Initiate streaming with requests.post, using stream=True for continuous data
-            response = requests.post(url, headers=self.config.headers, params=params, stream=True)
+            query_params = params.to_query_params()
+            query_params["sessionid"] = session_key  # Add session ID as a query parameter
+            query_params["linebreak"] = True
+
+            response = requests.post(url, headers=self.config.headers, params=query_params, stream=True)
             response.raise_for_status()
 
-            # Process each incoming chunk of data
             for chunk in response.iter_lines():
                 if stop_event.is_set():
                     break
                 if chunk:
                     try:
                         self._do_on_message(chunk.decode('utf-8'))
-                    except Exception as e: 
-                        self._do_on_error(e)  # Handle streaming-specific errors
+                    except Exception as e:
+                        self._do_on_error(e)
 
         except (TradierAPIException, requests.exceptions.RequestException) as e:
-            self._do_on_error(e)  # Handle setup errors
-        
+            self._do_on_error(e)
+
         finally:
             self._do_on_close()
 
@@ -93,28 +102,26 @@ class TradierWebsocketStreamer(TradierBaseStreamer):
         super().__init__(config, on_open, on_message, on_close, on_error)
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._task: Optional[asyncio.Task] = None
+        self._endpoint: Optional[Endpoints] = None
 
     def _build_stream_url(self, endpoint: str):
         """Builds the WebSocket URL based on the endpoint."""
         return f"{BaseURL.WEBSOCKET.value}{endpoint}"
     
-    async def _run_stream(self, session_key: str, stop_event: Event, symbols: Union[str, List[str]]):
-        # Convert symbols list to comma-separated string if needed
-        # if isinstance(symbols, list):
-        #     symbols = ",".join(symbols)
-        if isinstance(symbols, str):
-            symbols = [s.strip() for s in symbols.split(",")]
+    async def _run_stream(self, session_key: str, stop_event: Event, params: BaseParams):
+        """Handle the WebSocket connection and data stream."""
 
-        # WebSocket URL
-        url = self._build_stream_url(Endpoints.GET_STREAMING_MARKET_EVENTS.path)
+        # Convert parameters into query payload
+        payload_dict = params.to_query_params()  # Convert parameters to a dictionary
+        payload_dict["sessionid"] = session_key  # Add session ID
+        payload_dict["linebreak"] = True  # Include line breaks in the data
+        payload = json.dumps(payload_dict)  # Convert the updated dictionary to a JSON string
 
-        # Correctly format the payload
-        payload = json.dumps({
-            "symbols": symbols,
-            "sessionid": session_key,
-            "linebreak": True
-        })
+        if self._endpoint is None:
+            raise ValueError("Endpoint is not set.")
         
+        url = self._build_stream_url(self._endpoint.path)
+
         try:
             websocket = await websockets.connect(url, ssl=True, compression=None)
             await websocket.send(payload)
@@ -129,6 +136,7 @@ class TradierWebsocketStreamer(TradierBaseStreamer):
                 except Exception as e:
                     self._do_on_error(e)
                     break
+
             await websocket.close()
 
         except Exception as e:
@@ -136,15 +144,48 @@ class TradierWebsocketStreamer(TradierBaseStreamer):
 
         finally:
             self._do_on_close()
-
-    def run(self, session_key: str, stop_event: Event, symbols: Union[str, List[str]]):
+    def run(self, session_key: str, stop_event: Event,  params: BaseParams):
         """Run the WebSocket connection in the asyncio loop."""
         self._loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._loop)
-        self._task = self._loop.create_task(self._run_stream(session_key, stop_event, symbols))
+        self._task = self._loop.create_task(self._run_stream(session_key, stop_event, params))
 
         try:
             self._loop.run_until_complete(self._task)
         finally:
             self._loop.run_until_complete(self._loop.shutdown_asyncgens())
             self._loop.close()
+
+class TradierMarketsStreamer(TradierWebsocketStreamer):
+    def __init__(self, config, on_open=None, on_message=None, on_close=None, on_error=None):
+        super().__init__(config, on_open, on_message, on_close, on_error)
+        self._endpoint = Endpoints.GET_STREAMING_MARKET_EVENTS
+
+
+    def get_session_endpoint(self) -> Endpoints:
+        return Endpoints.CREATE_MARKET_SESSION
+
+    def run(self, session_key: str, stop_event: Event, params: BaseParams):
+        """Run the WebSocket connection for market events."""
+        if not isinstance(params, SymbolsParams):
+            raise ValueError("Invalid parameters for TradierMarketsStreamer. Expected SymbolsParams.")
+
+        # Call the WebSocket implementation
+        super().run(session_key, stop_event, params)
+
+class TradierAccountStreamer(TradierWebsocketStreamer):
+    def __init__(self, config, on_open=None, on_message=None, on_close=None, on_error=None):
+        super().__init__(config, on_open, on_message, on_close, on_error)
+        self._endpoint = Endpoints.GET_STREAMING_ACCOUNT_EVENTS
+
+
+    def get_session_endpoint(self) -> Endpoints:
+        return Endpoints.CREATE_ACCOUNT_SESSION
+
+    def run(self, session_key: str, stop_event: Event, params: BaseParams):
+        """Run the WebSocket connection for account events."""
+        if not isinstance(params, ExcludedAccountParams):
+            raise ValueError("Invalid parameters for TradierAccountStreamer. Expected AccountParams.")
+
+        # Call the WebSocket implementation
+        super().run(session_key, stop_event, params)

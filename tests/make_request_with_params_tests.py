@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from tradier_api import TradierApiController, Endpoints, AccountParams, OrderParams, \
-                        WatchlistParams
+                        WatchlistParams, SymbolsParams
 
 from tradier_api._core_types import BaseURL
 
@@ -21,6 +21,7 @@ class TestMakeRequestWithParams(unittest.TestCase):
     @patch('requests.request')
     def test_make_request_with_params(self, mock_request):
         # Prepare expected endpoint and parameter mappings
+        symbols = SymbolsParams(symbols=["AAPL", "GOOGL", "MSFT"])
         test_cases = [
             # AccountParams test cases
             (Endpoints.GET_BALANCES, AccountParams(account_id="12345678"), "/v1/accounts/12345678/balances"),

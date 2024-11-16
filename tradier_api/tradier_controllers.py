@@ -126,20 +126,20 @@ class TradierStreamController(TradierApiController):
 
     def create_session(self):
         """Creates a session and retrieves the session key."""
-        response = self.make_request(Endpoints.CREATE_MARKET_SESSION)
+        response = self.make_request(self.streamer.get_session_endpoint())
         self.session_key = response.get("stream", {}).get("sessionid")
         if not self.session_key:
             raise ValueError("Failed to retrieve session key.")
         logger.debug(f"Session key acquired: {self.session_key}")
 
-    def start(self, symbols):
+    def start(self, params: BaseParams):
         """Starts the HTTP streaming connection in a new thread."""
         if not self.session_key:
             self.create_session()  # Ensures a session is created before streaming
 
         # Set up a new thread for streaming
         self._stop_event.clear()
-        self._thread = threading.Thread(target=self.streamer.run, args=(self.session_key, self._stop_event, symbols,))
+        self._thread = threading.Thread(target=self.streamer.run, args=(self.session_key, self._stop_event, params,))
         self._thread.start()
 
     def close(self):
