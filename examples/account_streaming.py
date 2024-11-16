@@ -1,3 +1,11 @@
+"""
+Example of streaming account events using Tradier API.
+
+This script will establish a WebSocket connection to the Tradier API and stream
+account events for the specified account.
+
+Please refer to `_import_token.py` for details on how to set up API token values.
+"""
 from tradier_api import LiveConfig, TradierStreamController, TradierAccountStreamer, ExcludedAccountParams
 from _import_token import API_TOKEN as TRADIER_API_TOKEN
 
@@ -37,4 +45,5 @@ if __name__ == "__main__":
         print("\nStopped streaming.")
 
     finally:
+        # Streaming happens in a separate thread, so close that thread
         controller.close()

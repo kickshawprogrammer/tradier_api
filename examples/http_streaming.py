@@ -1,3 +1,11 @@
+"""
+Module example demonstrating how to fetch real-time market events using the Tradier API.
+
+This script will establish a streaming HTTP connection to the Tradier API and stream
+market events for the specified symbols.
+
+Please refer to `_import_token.py` for details on how to set up API token values.
+"""
 from tradier_api import LiveConfig, TradierStreamController, TradierHttpStreamer, SymbolsParams
 from _import_token import API_TOKEN as TRADIER_API_TOKEN
 
@@ -15,7 +23,7 @@ def on_error(error):
 
 if __name__ == "__main__":
     try:
-    # Initialize the API configuration and HTTP stream controller
+        # Initialize the API configuration and HTTP stream controller
         config = LiveConfig(token=TRADIER_API_TOKEN)
         streamer = TradierHttpStreamer(
             config=config,
@@ -37,4 +45,5 @@ if __name__ == "__main__":
         print("\nStopped streaming.")
 
     finally:
+        # Streaming happens in a separate thread, so close that thread
         controller.close()

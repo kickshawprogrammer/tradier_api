@@ -1,3 +1,8 @@
+"""
+Module example demonstrating how to fetch user profile data using the Tradier API.
+
+Please refer to `_import_token.py` for details on how to set up API token values.
+"""
 from tradier_api import LiveConfig, TradierApiController, Endpoints
 from _import_token import API_TOKEN as TRADIER_API_TOKEN
 
