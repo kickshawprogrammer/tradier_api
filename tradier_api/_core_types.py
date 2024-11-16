@@ -99,7 +99,7 @@ class ApiPaths(Enum):
 
     # WebSocket endpoints
     GET_STREAMING_MARKET_EVENTS = MARKETS_BASE + "/events"      # ws
-    GET_STREAMING_ACCOUNT_EVENTS = ACCOUNTS_BASE + "/events"    # ws
+    GET_STREAMING_ACCOUNT_EVENTS = ACCOUNTS + "/events"    # ws
 
     # Watchlist endpoints
     GET_WATCHLISTS = WATCHLISTS_BASE                                 # GET

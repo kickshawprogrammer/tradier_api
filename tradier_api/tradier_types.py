@@ -5,7 +5,7 @@ This module provides classes and types that can be used by external callers to
 interact with the Tradier API. It includes exceptions that may be raised by the
 API, as well as other types that can be used to define API requests and responses.
 
-Internal implementation details are defined in `_core_definitions.py` and should \
+Internal implementation details are defined in `_core_definitions.py` and should 
 not be used directly by external callers.
 """
 import re
