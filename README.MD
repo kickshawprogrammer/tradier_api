@@ -4,7 +4,8 @@
 # Tradier API Python Library
 
 [![PyPI version](https://badge.fury.io/py/tradier-api.svg)](https://pypi.org/project/tradier-api/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/license-Custom-blue.svg)](#license)
+
 
 A Python library for interacting with the [Tradier API](https://developer.tradier.com/). This library simplifies access to Tradier's market data, trading functionalities, and account management features.
 
