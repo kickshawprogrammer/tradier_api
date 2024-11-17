@@ -1,3 +1,35 @@
+"""
+Unit test module for the TradierHttpStreamer class.
+
+This module contains unit tests for verifying the functionality and behavior of the TradierHttpStreamer
+class, which is responsible for handling HTTP streaming requests to the Tradier API. The tests are 
+designed to ensure that the HTTP streaming connection is established correctly, that data can be streamed 
+in real-time, and that errors are appropriately handled.
+
+The tests in this module cover the following scenarios:
+    - Correct initialization of the TradierHttpStreamer with valid configuration.
+    - Verification of URL construction and endpoint usage for the HTTP stream.
+    - Handling of streaming data events, including on_open, on_message, on_close, and on_error callbacks.
+    - Error handling for HTTP errors and exceptions that may occur during streaming.
+    - Thread management for starting and stopping the HTTP streaming connection.
+
+Key Components:
+    - TradierHttpStreamer: The main class under test, responsible for managing HTTP streaming connections.
+    - TradierConfig: Used to configure the API token and environment settings for the streamer.
+    - SymbolsParams: Optional parameters for specifying market symbols to stream data for.
+    - unittest: The testing framework used to structure and run test cases.
+    - unittest.mock: Provides tools for mocking and patching dependencies within test cases.
+    - requests: Utilized for simulating HTTP requests and responses during testing.
+
+Usage:
+To execute the tests in this module, run the file using a Python test runner such as `unittest` or `pytest`.
+Ensure that the Tradier API client library is installed and properly configured in the testing environment.
+
+Note:
+This module assumes that the Tradier API token and environment settings are correctly set up in the
+TradierConfig object. The tests are designed to be run in isolation, using mocking to simulate API
+interactions without requiring an active network connection.
+"""
 import unittest
 from unittest.mock import Mock, patch
 import requests, threading

@@ -1,5 +1,8 @@
 """
-Module example demonstrating how to stream real-time market events using the Tradier API.
+Module example demonstrating how to fetch real-time market events using the Tradier API.
+
+This script will establish a WebSocket connection to the Tradier API and stream
+market events for the specified symbols.
 
 Please refer to `_import_token.py` for details on how to set up API token values.
 """

@@ -1,3 +1,34 @@
+"""
+Tradier API client library for Python.
+
+The Tradier API is a set of cloud-based financial services offering trading, real-time
+data, and other financial services through a simple, yet powerful API.
+
+This library provides a convenient interface to these services, allowing you to:
+
+- Fetch real-time market data
+- Stream real-time market events
+- Fetch historical market data
+- Trade stocks and options
+- Manage watchlists and accounts
+- Fetch corporate actions and other financial data
+
+The library is organized into several subpackages:
+
+- `tradier_api.tradier_types`: defines public types and exceptions used by the API
+- `tradier_api.tradier_params`: defines parameter classes used by the API
+- `tradier_api.tradier_config`: defines configuration classes used by the API
+- `tradier_api.tradier_controllers`: defines classes used to interact with the API
+- `tradier_api.tradier_streams`: defines classes used to stream data from the API
+
+The main entrypoints are:
+
+- `TradierConfig`: a class representing the configuration for the API
+- `TradierApiController`: a class providing a convenient interface to the API
+- `TradierStreamController`: a class providing a convenient interface to streaming
+  data from the API
+
+"""
 import logging
 
 from .tradier_types import TradierAPIException, Endpoints, WebSocketEndpoints, ExchangeCode

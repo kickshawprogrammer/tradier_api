@@ -1,3 +1,29 @@
+"""
+tradier_base_streamer_tests.py
+
+This module contains unit tests for the `TradierBaseStreamer` class, which is the abstract base class
+for all streamers in the Tradier API library. It provides tests for the core functionality of the base
+streamer, such as event handling and error handling.
+
+Classes:
+    - TestTradierBaseStreamer: A unittest.TestCase subclass containing test methods for the
+                               `TradierBaseStreamer` class.
+
+Test Cases:
+    - test_on_open_event_called: Verifies that the on_open() method is called when a stream is started,
+                                 ensuring that the streamer properly handles the on_open event.
+
+Dependencies:
+    - unittest: Provides the base class for creating and running test cases.
+    - unittest.mock: Provides utilities for mocking objects and asserting calls.
+
+Classes and methods under test:
+    - TradierBaseStreamer class
+        - on_open() method
+
+Please ensure that the tests are run in an environment where the Tradier API
+client library has been installed and configured properly.
+"""
 import unittest
 from unittest.mock import Mock
 from tradier_api import TradierBaseStreamer, TradierConfig

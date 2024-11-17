@@ -1,3 +1,12 @@
+"""
+Module containing configuration classes for the Tradier API.
+
+This module provides classes for configuring the environment and token for the
+Tradier API. It also includes a base class for defining API endpoints.
+
+Internal implementation details are defined in `_core_definitions.py` and should
+not be used directly by external callers.
+"""
 from enum import Enum
 from typing import Optional, Dict, Union
 
@@ -82,8 +91,10 @@ class TradierConfig:
         self.headers = self._build_headers()  # Rebuild headers on change
 
 class SandboxConfig(TradierConfig):
+    """Configuration for the sandbox environment."""
     def __init__(self, token: str):
         super().__init__(token, APIEnv.SANDBOX)
 
+# Aliases
 LiveConfig = TradierConfig
 PaperConfig = SandboxConfig

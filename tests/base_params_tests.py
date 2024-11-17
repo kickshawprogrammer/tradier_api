@@ -1,7 +1,38 @@
+"""
+This module contains unit tests for the parameter classes used in the Tradier API.
+
+The tests cover the following parameter classes:
+    - `SymbolsParams`: Validates handling of symbol inputs, ensuring the correct initialization
+    and conversion to query parameters. Tests include:
+    - Requirement to provide valid symbols, which should raise a `ValueError` for invalid inputs
+        like `None`, an empty string, or an empty list.
+    - Handling of valid list inputs, ensuring they are correctly converted to query parameters.
+    - Handling of valid comma-separated string inputs, ensuring they are correctly parsed and 
+        converted to query parameters.
+
+    - `ExcludedAccountParams`: Validates handling of account IDs, ensuring correct initialization
+    and conversion to query parameters. Tests include:
+    - Handling of `None` input, ensuring it is allowed and correctly handled when converting
+        to query parameters.
+
+    - `WatchlistParams`: Validates handling of watchlist ID and optional symbol inputs, ensuring 
+    correct initialization and conversion to query parameters. The tests aim to ensure:
+    - Both watchlist ID and symbol are correctly included in the query parameters.
+    - The class can function with only a watchlist ID.
+    - An error is raised if the watchlist ID is not provided.
+
+These tests ensure that the parameter classes behave as expected and generate the correct query
+parameters for API requests. This helps maintain the robustness and reliability of the Tradier
+API client by catching potential issues in parameter handling early in the development process.
+
+Note: These tests rely on the `unittest` framework and use mocking for any necessary dependencies.
+
+Please ensure that the tests are run in an environment where the Tradier API
+client library has been installed and configured properly.
+"""
 import unittest
 from typing import Optional, Dict, Any, Union, List
 from tradier_api import SymbolsParams, ExcludedAccountParams, WatchlistParams 
-
 
 class TestBaseParams(unittest.TestCase):
     def test_symbols_params_requires_symbols(self):

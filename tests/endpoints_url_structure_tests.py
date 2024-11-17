@@ -1,3 +1,44 @@
+"""
+Unit test module for verifying the URL structure of API endpoints in the Tradier API library.
+
+This module contains test cases for ensuring that the URL paths defined in the `Endpoints` class
+of the Tradier API library adhere to the expected structure and contain the correct placeholders
+for path parameters. The tests are designed to validate the integrity of URL paths by checking
+for the presence of the appropriate placeholders required for constructing valid API requests.
+
+Classes:
+    TestApiPathsUrlStructure: A unittest.TestCase subclass that provides test methods for
+                              validating the URL structure of API endpoints.
+
+Test Cases:
+    - test_endpoint_url_placeholders: Verifies that each API endpoint URL contains the expected
+                                       placeholders for path parameters, ensuring that endpoints
+                                       requiring dynamic values have the correct parameter names
+                                       present in the path.
+    
+Dependencies:
+    - unittest: Provides the base class for creating and running test cases.
+    - re: Utilized for regular expression operations within test assertions.
+    - tradier_api.Endpoints: The class containing endpoint definitions that map to specific
+                             API operations.
+
+Usage:
+    Run this module with a Python test runner such as `unittest` or `pytest` to execute the
+    test cases and validate the URL structures of the Tradier API endpoints.
+
+Notes:
+    - This module assumes that the `Endpoints` class contains endpoint definitions with
+      associated URL path templates that may include placeholders for dynamic parameters.
+    - The expected placeholders are defined in the `expected_placeholders` dictionary, where
+      each key corresponds to an endpoint and the value is a list of expected parameter names.
+
+This module is part of the Tradier API library's test suite, aimed at maintaining the reliability
+and correctness of the API client by ensuring that endpoint URLs are properly formatted and ready
+for use in API requests.
+
+Please ensure that the tests are run in an environment where the Tradier API
+client library has been installed and configured properly.
+"""
 import unittest
 import re
 from tradier_api import Endpoints

@@ -1,3 +1,42 @@
+"""
+Module: tests/make_request_with_params_tests.py
+
+This module contains unit tests for testing the functionality of making requests with various 
+parameters using the Tradier API. These tests are designed to ensure that the `TradierApiController` 
+correctly handles different parameter types and API endpoint requests. The module leverages the 
+`unittest` framework for structuring and running test cases, and utilizes mocking to simulate 
+API interactions without making actual HTTP requests.
+
+The primary focus of this module is to validate the correct construction and execution of requests 
+using parameter classes such as `AccountParams`, `OrderParams`, `WatchlistParams`, and `SymbolsParams`. 
+Each parameter class is responsible for managing specific parts of the API request, such as account 
+information, order details, watchlist specifications, and symbol queries.
+
+Key Components:
+  - `TradierApiController`: The main controller used for interacting with Tradier API endpoints. 
+    It is responsible for constructing requests, sending them to the appropriate endpoints, and 
+    handling responses.
+  - Parameter Classes: These classes encapsulate various parameters required for different API requests:
+    - `AccountParams`: Handles parameters related to account-specific API requests.
+    - `OrderParams`: Represents parameters for order-related API operations.
+    - `WatchlistParams`: Manages parameters for watchlist-related API requests.
+    - `SymbolsParams`: Handles parameters for symbol-related API queries.
+
+Test Structure:
+  - `TestMakeRequestWithParams`: The main test class that inherits from `unittest.TestCase`. It 
+    includes setup methods for initializing test environments and test methods for verifying 
+    the correct behavior of request-making processes.
+  - Mocking: Utilizes `unittest.mock` to simulate API responses and interactions, allowing tests 
+    to run in isolation from actual API endpoints.
+
+This module ensures the robustness and reliability of the Tradier API client by validating 
+that requests are constructed and executed correctly with varying parameters. It helps 
+identify and address potential issues early in the development process, facilitating 
+smooth integration of the Tradier API into applications.
+
+Please ensure that the Tradier API client library is installed and properly configured 
+in your testing environment before running these tests.
+"""
 import unittest
 from unittest.mock import patch, MagicMock
 from tradier_api import TradierApiController, Endpoints, AccountParams, OrderParams, \

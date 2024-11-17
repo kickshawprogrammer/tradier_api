@@ -104,7 +104,8 @@ pytest tests/
 │  
 ├── TradierConfig: Manages API configuration, including environment selection and headers.  
 │   ├── LiveConfig:                 Configures the API for live production usage.  
-│   └── SandboxConfig:              Configures the API for sandbox (testing) environment usage.  
+│   ├── SandboxConfig:              Configures the API for sandbox (testing) environment usage.  
+│   └── PaperConfig:                Alias for SandobxConfig (paper-trading) type.    
 │  
 ├── TradierBaseController: Base controller class for shared logic across Tradier API controllers.  
 │   ├── TradierApiController:       Main controller for interacting with Tradier REST API endpoints.  

@@ -1,3 +1,25 @@
+"""
+Tests for the TradierApiController class.
+
+This module contains unit tests for the TradierApiController class, which
+provides a high-level interface for interacting with the Tradier API.
+
+The tests cover the following scenarios:
+
+    - Correct construction of the API controller with a valid configuration.
+    - Correct handling of API requests and responses.
+    - Correct handling of errors raised by the API.
+    - Correct handling of HTTP errors.
+
+The tests are designed to be run in isolation from the actual API, and
+utilize mocking to simulate API responses.
+
+This will execute all of the tests in the project, including the tests in
+this module.
+
+Please ensure that the tests are run in an environment where the Tradier API
+client library has been installed and configured properly.
+"""
 import unittest
 from unittest.mock import patch, MagicMock
 

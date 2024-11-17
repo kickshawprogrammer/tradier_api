@@ -1,3 +1,25 @@
+"""
+Tests for the TradierStreamController class.
+
+This module contains unit tests for the TradierStreamController class, which is
+responsible for managing the lifecycle of a streaming connection to the Tradier
+API. The controller provides methods for starting and stopping the stream, as
+well as managing the underlying streamer object.
+
+The tests in this module cover the following scenarios:
+
+    - Correct construction of the controller with a valid configuration and streamer.
+    - Correct starting and stopping of the stream.
+    - Correct handling of errors raised by the streamer.
+    - Correct thread management for background streaming.
+
+This module is part of the Tradier API library's test suite, aimed at maintaining
+the reliability and correctness of the API client by ensuring that the
+TradierStreamController class properly manages streaming connections.
+
+Please ensure that the tests are run in an environment where the Tradier API
+client library has been installed and configured properly.
+"""
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 from tradier_api import TradierConfig, TradierStreamController, TradierHttpStreamer
@@ -16,7 +38,7 @@ class TestTradierStreamController(unittest.TestCase):
         self.streamer.run = MagicMock()
 
         # Call start, which should invoke create_session and then run
-        self.controller.start(["AAPL"])
+        self.controller.start(["AAPL"]) # type: ignore
 
         # Verify create_session was called
         self.controller.create_session.assert_called_once()

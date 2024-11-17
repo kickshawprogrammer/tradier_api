@@ -1,3 +1,26 @@
+"""
+Module: tests/tradier_websocket_streamer_tests.py
+
+This module contains unit tests for the TradierMarketsStreamer and TradierAccountStreamer classes.
+
+The tests cover the following scenarios:
+
+    - Correct construction of streamers with valid configuration and parameters.
+    - Correct handling of WebSocket connection setup and teardown.
+    - Correct handling of incoming messages from the API.
+    - Correct handling of errors raised by the API.
+    - Correct handling of throttling errors raised by the API.
+    - Correct handling of reconnections and session key refreshes.
+
+The tests are designed to be run in isolation from the actual API, and
+utilize mocking to simulate API responses.
+
+This will execute all of the tests in the project, including the tests in
+this module.
+
+Please ensure that the tests are run in an environment where the Tradier API
+client library has been installed and configured properly.
+"""
 import unittest
 import asyncio
 import json

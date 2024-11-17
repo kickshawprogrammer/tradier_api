@@ -1,3 +1,23 @@
+"""
+Module containing abstract base classes for API controllers.
+
+This module provides abstract base classes for API controllers for the Tradier
+API. These controllers provide higher-level interfaces for interacting with the
+API, wrapping the underlying HTTP request and error handling.
+
+Controllers are responsible for encapsulating the logic for interacting with the
+API, including generating the correct URL for the request and handling errors
+raised by the API.
+
+This module provides the following abstract base classes:
+
+- `TradierBaseController`: The base class for all API controllers.
+- `TradierApiController`: A controller for interacting with the main API
+  endpoint.
+- `TradierStreamController`: A controller for interacting with the streaming API
+  endpoint.
+
+"""
 import time
 import requests
 import threading
@@ -15,6 +35,24 @@ import logging
 logger = logging.getLogger(__name__)
 
 class TradierBaseController:
+    """
+    Abstract base class for API controllers.
+
+    This class serves as the base class for all API controllers. It provides a standard
+    interface for interacting with the API, including:
+
+    - `__init__`: Initializes the controller with the given configuration.
+    - `_get_base_url`: Returns the base URL for the API based on the environment.
+    - `_build_url`: Builds the URL based on the base URL and endpoint.
+
+    This class is intended to be subclassed to provide more specialized controllers
+    for different endpoints of the API.
+
+    Attributes:
+        config (TradierConfig): The configuration for the controller.
+        base_url (str): The base URL for the API based on the environment.
+        headers (Dict[str, str]): The headers to be used when making requests to the API.
+    """
     def __init__(self, config: TradierConfig):
         self.config = config
         self.base_url = self._get_base_url(config.environment.value)
@@ -36,7 +74,32 @@ class TradierBaseController:
         return f"{self.base_url}{endpoint}"
     
 class TradierApiController(TradierBaseController):
+    """
+    Controller class for interacting with the Tradier API.
 
+    The `TradierApiController` is responsible for making requests to the Tradier API,
+    handling throttling, and managing errors. It extends the `TradierBaseController` 
+    to provide additional functionality specific to the Tradier API endpoints.
+
+    Attributes:
+        config (TradierConfig): The configuration for the API controller, including
+            the access token and environment settings.
+        headers (Dict[str, str]): HTTP headers used for requests to the API.
+
+    Inner Classes:
+        ThrottleHandler: Handles API rate limiting by managing the waiting time 
+                         based on the rate limit headers returned by the API.
+        ApiErrorHandler: Processes the API response to identify and handle any
+                         errors, whether HTTP-related or specific to the Tradier API.
+    
+    Methods:
+        __init__(config: TradierConfig):
+            Initializes the controller with the provided configuration.
+
+        make_request(endpoint: Endpoints, path_params: Optional[BaseParams] = None, 
+                     query_params: Optional[Dict[str, Any]] = None) -> Any:
+            Makes a request to the Tradier API using the specified endpoint and parameters.
+    """
     class ThrottleHandler:
         @staticmethod
         def handle_throttling(response):
@@ -117,6 +180,35 @@ class TradierApiController(TradierBaseController):
             raise Exception(f"Error making request to {url}: {str(e)}") from e
     
 class TradierStreamController(TradierApiController):
+    """
+    Controller class for interacting with the Tradier API for streaming.
+
+    The `TradierStreamController` is responsible for managing the lifetime of an
+    streaming connection to the Tradier API. It extends the `TradierApiController`
+    to provide additional functionality specific to the streaming endpoints.
+
+    Attributes:
+        config (TradierConfig): The configuration for the API controller, including
+            the access token and environment settings.
+        streamer (TradierBaseStreamer): The streamer object responsible for running
+            the streaming connection.
+        session_key (str): The session key acquired after creating a session.
+        _stop_event (threading.Event): Used to signal the stream to stop.
+        _thread (threading.Thread): The thread running the streaming connection.
+
+    Methods:
+        __init__(config: TradierConfig, streamer: TradierBaseStreamer):
+            Initializes the controller with the provided configuration and streamer.
+
+        create_session():
+            Creates a session and retrieves the session key.
+
+        start(params: BaseParams):
+            Starts the streaming connection in a new thread using the session key.
+
+        close():
+            Signals the stream to stop and waits for the thread to exit.
+    """
     def __init__(self, config: TradierConfig, streamer: TradierBaseStreamer):
         super().__init__(config)
         self.streamer = streamer

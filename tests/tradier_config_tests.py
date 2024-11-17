@@ -1,3 +1,24 @@
+"""
+Tests for the TradierConfig class.
+
+This module contains unit tests for the TradierConfig class, which is responsible
+for managing API configuration, including environment selection and headers.
+
+The tests cover the following scenarios:
+
+    - Correct construction of the configuration with a valid token.
+    - Correct selection of the API environment using string or enum values.
+    - Correct handling of invalid environment values.
+    - Correct addition of the "Authorization" header with a valid token.
+    - Correct addition of the "Accept-Encoding" header with the value "gzip".
+
+This module is part of the Tradier API library's test suite, aimed at maintaining
+the reliability and correctness of the API client by ensuring that configuration
+is properly set up and ready for use in API requests.
+
+Please ensure that the Tradier API client library is installed and configured
+properly in your testing environment before running these tests.
+"""
 import unittest
 from typing import Dict
 
