@@ -100,36 +100,36 @@ pytest tests/
 ## Class Hierarchy
 
 ```
-┌── TradierAPIException: Custom exception class for handling errors specific to the Tradier API.  
-│  
-├── TradierConfig: Manages API configuration, including environment selection and headers.  
-│   ├── LiveConfig:                 Configures the API for live production usage.  
-│   ├── SandboxConfig:              Configures the API for sandbox (testing) environment usage.  
-│   └── PaperConfig:                Alias for SandobxConfig (paper-trading) type.    
-│  
-├── TradierBaseController: Base controller class for shared logic across Tradier API controllers.  
-│   ├── TradierApiController:       Main controller for interacting with Tradier REST API endpoints.  
-│   └── TradierStreamController:    Handles configuration and session control for streaming data connections.  
-│  
-├── TradierBaseStreamer: Base class for implementing HTTP and WebSocket streaming functionality.  
-│   ├── TradierHttpStreamer:        Provides functionality for HTTP-based streaming of market data or events.  
-│   └── TradierWebsocketStreamer:   Implements WebSocket-based streaming for live market and account data.  
-│       ├── TradierMarketsStreamer: Specializes in market-specific data streams (e.g., quotes, trades).  
-│       └── TradierAccountStreamer: Specializes in account-related data streams (e.g., balances, orders).  
-│  
-├── BaseParams: Abstract base class for defining parameter types used in API requests.  
-│   ├── AccountParams:              Handles parameters related to account-specific API requests.  
-│   ├── OrderParams:                Represents parameters for order-related API operations.  
-│   ├── WatchlistParams:            Manages parameters for watchlist-related API requests.  
-│   └── BaseParamWithNormalization: Base class for parameters that require normalization (e.g., list/string parsing).  
-│       ├── SymbolsParams:          Handles parameters for symbol-related API queries with validation.  
-│       └── ExcludedAccountParams:  Manages excluded account parameters for API queries, allowing flexible inputs.  
-│  
-└── Enums: Group of enumerations for standardizing API-related constants.  
-    ├── APIEnv:                     Defines API environments (e.g., live, sandbox, stream, websocket).  
-    ├── Endpoints:                  Maps REST API endpoint paths to their corresponding operations.  
-    ├── WebSocketEndpoints:         Enumerates WebSocket-specific endpoints for Tradier API streaming.  
-    └── ExchangeCode:               Defines exchange codes used for identifying market exchanges.  
++--- TradierAPIException: Custom exception class for handling errors specific to the Tradier API.  
+|  
++-- TradierConfig: Manages API configuration, including environment selection and headers.  
+|   +-- LiveConfig:                 Configures the API for live production usage.  
+|   +-- SandboxConfig:              Configures the API for sandbox (testing) environment usage.  
+|   +-- PaperConfig:                Alias for SandobxConfig (paper-trading) type.    
+|  
++-- TradierBaseController: Base controller class for shared logic across Tradier API controllers.  
+|   +-- TradierApiController:       Main controller for interacting with Tradier REST API endpoints.  
+|   +-- TradierStreamController:    Handles configuration and session control for streaming data connections.  
+|  
++-- TradierBaseStreamer: Base class for implementing HTTP and WebSocket streaming functionality.  
+|   +-- TradierHttpStreamer:        Provides functionality for HTTP-based streaming of market data or events.  
+|   +-- TradierWebsocketStreamer:   Implements WebSocket-based streaming for live market and account data.  
+|       +-- TradierMarketsStreamer: Specializes in market-specific data streams (e.g., quotes, trades).  
+|       +-- TradierAccountStreamer: Specializes in account-related data streams (e.g., balances, orders).  
+|  
++-- BaseParams: Abstract base class for defining parameter types used in API requests.  
+|   +-- AccountParams:              Handles parameters related to account-specific API requests.  
+|   +-- OrderParams:                Represents parameters for order-related API operations.  
+|   +-- WatchlistParams:            Manages parameters for watchlist-related API requests.  
+|   +-- BaseParamWithNormalization: Base class for parameters that require normalization (e.g., list/string parsing).  
+|       +-- SymbolsParams:          Handles parameters for symbol-related API queries with validation.  
+|       +-- ExcludedAccountParams:  Manages excluded account parameters for API queries, allowing flexible inputs.  
+|  
++-- Enums: Group of enumerations for standardizing API-related constants.  
+    +-- APIEnv:                     Defines API environments (e.g., live, sandbox, stream, websocket).  
+    +-- Endpoints:                  Maps REST API endpoint paths to their corresponding operations.  
+    +-- WebSocketEndpoints:         Enumerates WebSocket-specific endpoints for Tradier API streaming.  
+    +-- ExchangeCode:               Defines exchange codes used for identifying market exchanges.  
 ```
 ---
 
