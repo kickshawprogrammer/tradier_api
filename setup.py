@@ -8,7 +8,9 @@ setup(
     license="Feel free to use in any way you wish; but please, be kind and do good!",
     packages=find_packages(include=["tradier_api", "tradier_api.*"]),
     install_requires=[
-        "requests>=2.20.0",
+        "requests>=2.32.3",
+        "websockets>=14.1",
+        
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
