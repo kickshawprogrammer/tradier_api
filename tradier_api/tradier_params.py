@@ -50,7 +50,7 @@ class BaseParamWithNormalization(BaseParams):
         """Convert the normalized values to a query parameter dictionary."""
         if not self.values:
             return {}  # Return an empty dictionary if there are no values
-        return {self.key: ",".join(self.values)}
+        return {self.key: self.values}
 
 class SymbolsParams(BaseParamWithNormalization):
     def __init__(self, symbols: Union[List[str], str]):

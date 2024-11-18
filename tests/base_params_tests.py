@@ -49,14 +49,14 @@ class TestBaseParams(unittest.TestCase):
         symbols = ["SPY", "AAPL", "TSLA"]
         params = SymbolsParams(symbols)
         query_params = params.to_query_params()
-        self.assertEqual(query_params, {"symbols": "SPY,AAPL,TSLA"})
+        self.assertEqual(query_params, {"symbols": symbols})
 
     def test_symbols_params_with_string(self):
         """Ensure SymbolsParams handles comma-separated string input correctly."""
         symbols = "SPY,AAPL,TSLA"
         params = SymbolsParams(symbols)
         query_params = params.to_query_params()
-        self.assertEqual(query_params, {"symbols": "SPY,AAPL,TSLA"})
+        self.assertEqual(query_params, {"symbols": ["SPY","AAPL","TSLA"]})
 
     def test_excluded_account_params_allows_none(self):
         """Ensure ExcludedAccountParams handles None correctly."""
@@ -69,14 +69,14 @@ class TestBaseParams(unittest.TestCase):
         account_ids = ["acc1", "acc2", "acc3"]
         params = ExcludedAccountParams(account_ids)
         query_params = params.to_query_params()
-        self.assertEqual(query_params, {"account_id": "acc1,acc2,acc3"})
+        self.assertEqual(query_params, {"account_id": account_ids})
 
     def test_excluded_account_params_with_string(self):
         """Ensure ExcludedAccountParams handles comma-separated string input correctly."""
         account_ids = "acc1,acc2,acc3"
         params = ExcludedAccountParams(account_ids)
         query_params = params.to_query_params()
-        self.assertEqual(query_params, {"account_id": "acc1,acc2,acc3"})
+        self.assertEqual(query_params, {"account_id": ["acc1","acc2","acc3"]})
 
     def test_watchlist_params_with_symbol(self):
         """Ensure WatchlistParams handles both watchlist_id and symbol."""
