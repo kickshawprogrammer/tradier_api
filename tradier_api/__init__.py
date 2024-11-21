@@ -21,7 +21,7 @@ The library is organized into several subpackages:
 - `tradier_api.tradier_controllers`: defines classes used to interact with the API
 - `tradier_api.tradier_streams`: defines classes used to stream data from the API
 
-The main entrypoints are:
+The main entry points are:
 
 - `TradierConfig`: a class representing the configuration for the API
 - `TradierApiController`: a class providing a convenient interface to the API
@@ -29,6 +29,7 @@ The main entrypoints are:
   data from the API
 
 """
+
 import logging
 
 from .tradier_types import TradierAPIException, Endpoints, WebSocketEndpoints, ExchangeCode
@@ -43,6 +44,15 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 logger.info(f"Initializing Tradier API: {__name__}")
+
+# Metadata
+__version__ = "0.1.2"
+__author__ = "KickshawProgrammer"
+__email__ = "kickshawprogrammer@gmail.com"
+__license__ = "MIT"
+__url__ = "https://github.com/kickshawprogrammer/tradier_api"
+__description__ = "A Python library for the Tradier API"
+__status__ = "Development"
 
 __all__ = [
     # tradier_config.py
@@ -72,11 +82,10 @@ __all__ = [
     "TradierApiController",
     "TradierStreamController",
 
-    #tradier_streams.py
+    # tradier_streams.py
     "TradierBaseStreamer",
     "TradierHttpStreamer",
     "TradierWebsocketStreamer",
     "TradierMarketsStreamer",
-    "TradierAccountStreamer"
+    "TradierAccountStreamer",
 ]
-    
