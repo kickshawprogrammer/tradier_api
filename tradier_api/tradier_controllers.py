@@ -23,11 +23,11 @@ import requests
 import threading
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Union
 
 from ._core_types import BaseURL
 from .tradier_types import TradierAPIException, Endpoints
-from .tradier_params import BaseParams
+from .tradier_params import PathParams, QueryParams, BaseParamWithNormalization
 from .tradier_config import TradierConfig
 from .tradier_streams import TradierBaseStreamer
 
@@ -144,15 +144,32 @@ class TradierApiController(TradierBaseController):
     def __init__(self, config: TradierConfig):
         super().__init__(config)
 
-    def make_request(self, endpoint: Endpoints, path_params: Optional[BaseParams] = None, query_params: Optional[Dict[str, Any]] = None) -> Any:
+    def make_request( 
+            self,
+            endpoint: Endpoints, 
+            path_params: Optional[PathParams] = None, 
+            query_params: Optional[Union[QueryParams, Dict[str, Any]]] = None 
+    ) -> Any:
         """Makes a request to the Tradier API with the given endpoint and parameters."""
         
-        # Convert path parameters to dictionary and format the URL
-        formatted_path = endpoint.format_path(**(path_params.to_query_params() if path_params else {}))
+        # Helper function to normalize query parameters
+        def normalize_query_params(params: Optional[Union[QueryParams, Dict[str, Any]]]) -> Dict[str, Any]:
+            """Converts QueryParams or dictionary into a standard dictionary."""
+            if params is None:
+                return {}
+            if isinstance(params, QueryParams):
+                return params.to_query_params()
+            if isinstance(params, dict):
+                return params
+            raise ValueError("query_params must be of type QueryParams or Dict[str, Any]")
+        
+        # Normalize path parameters
+        path_dict = path_params.to_query_params() if path_params else {}
+        formatted_path = endpoint.format_path(**path_dict)
         url = self._build_url(formatted_path)
         
-        # Combine query parameters if provided
-        final_query_params = query_params or {}
+        # Normalize query parameters
+        final_query_params = normalize_query_params(query_params)
 
         try:
             response = requests.request(
@@ -160,16 +177,15 @@ class TradierApiController(TradierBaseController):
                 url=url,
                 headers=self.headers,
                 params=final_query_params if endpoint.method in ["GET", "DELETE"] else None,
-                data=final_query_params if endpoint.method in ["POST", "PUT"] else None
+                data=final_query_params if endpoint.method in ["POST", "PUT"] else None,
             )
 
             # Error and throttling handling
             self.ApiErrorHandler.handle_errors(response)
             self.ThrottleHandler.handle_throttling(response)
 
-            print(f"Response status: {response.json()}")
             return response.json()
-            
+
         except requests.exceptions.HTTPError as e:
             raise
 
@@ -178,7 +194,7 @@ class TradierApiController(TradierBaseController):
 
         except Exception as e:
             raise Exception(f"Error making request to {url}: {str(e)}") from e
-    
+        
 class TradierStreamController(TradierApiController):
     """
     Controller class for interacting with the Tradier API for streaming.
@@ -224,7 +240,7 @@ class TradierStreamController(TradierApiController):
             raise ValueError("Failed to retrieve session key.")
         logger.debug(f"Session key acquired: {self.session_key}")
 
-    def start(self, params: BaseParams):
+    def start(self, params: BaseParamWithNormalization):
         """Starts the HTTP streaming connection in a new thread."""
         if not self.session_key:
             self.create_session()  # Ensures a session is created before streaming

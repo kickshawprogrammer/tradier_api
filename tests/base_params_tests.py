@@ -32,7 +32,7 @@ client library has been installed and configured properly.
 """
 import unittest
 from typing import Optional, Dict, Any, Union, List
-from tradier_api import SymbolsParams, ExcludedAccountParams, WatchlistParams 
+from tradier_api import SymbolsParams, ExcludedAccountParams, WatchlistPathParams
 
 class TestBaseParams(unittest.TestCase):
     def test_symbols_params_requires_symbols(self):
@@ -80,17 +80,17 @@ class TestBaseParams(unittest.TestCase):
 
     def test_watchlist_params_with_symbol(self):
         """Ensure WatchlistParams handles both watchlist_id and symbol."""
-        params = WatchlistParams(watchlist_id="wl123", symbol="AAPL")
+        params = WatchlistPathParams(watchlist_id="wl123", symbol="AAPL")
         query_params = params.to_query_params()
         self.assertEqual(query_params, {"watchlist_id": "wl123", "symbol": "AAPL"})
 
     def test_watchlist_params_without_symbol(self):
         """Ensure WatchlistParams works with only watchlist_id."""
-        params = WatchlistParams(watchlist_id="wl123")
+        params = WatchlistPathParams(watchlist_id="wl123")
         query_params = params.to_query_params()
         self.assertEqual(query_params, {"watchlist_id": "wl123"})
 
     def test_watchlist_params_invalid_id(self):
         """Ensure WatchlistParams raises an error for an empty watchlist_id."""
         with self.assertRaises(ValueError):
-            WatchlistParams(watchlist_id="")
+            WatchlistPathParams(watchlist_id="")

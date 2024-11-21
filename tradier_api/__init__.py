@@ -32,8 +32,8 @@ The main entrypoints are:
 import logging
 
 from .tradier_types import TradierAPIException, Endpoints, WebSocketEndpoints, ExchangeCode
-from .tradier_params import (BaseParams, AccountParams, OrderParams, WatchlistParams,
-                             SymbolsParams, ExcludedAccountParams)
+from .tradier_params import (PathParams, QueryParams, AccountPathParams, OrderPathParams,
+                             WatchlistPathParams, SymbolsParams, ExcludedAccountParams)
 from .tradier_config import APIEnv, TradierConfig, SandboxConfig, LiveConfig, PaperConfig
 from .tradier_controllers import TradierBaseController, TradierApiController, TradierStreamController
 from .tradier_streams import (TradierBaseStreamer, TradierHttpStreamer, TradierWebsocketStreamer,
@@ -59,10 +59,11 @@ __all__ = [
     "ExchangeCode",
 
     # tradier_params.py
-    "BaseParams",
-    "AccountParams",
-    "OrderParams",
-    "WatchlistParams",
+    "PathParams",
+    "QueryParams",
+    "AccountPathParams",
+    "OrderPathParams",
+    "WatchlistPathParams",
     "SymbolsParams",
     "ExcludedAccountParams",
 

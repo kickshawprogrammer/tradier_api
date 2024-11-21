@@ -8,7 +8,7 @@ correctly handles different parameter types and API endpoint requests. The modul
 API interactions without making actual HTTP requests.
 
 The primary focus of this module is to validate the correct construction and execution of requests 
-using parameter classes such as `AccountParams`, `OrderParams`, `WatchlistParams`, and `SymbolsParams`. 
+using parameter classes such as `AccountPathParams`, `OrderPathParams`, `WatchlistPathParams`, and `SymbolsParams`. 
 Each parameter class is responsible for managing specific parts of the API request, such as account 
 information, order details, watchlist specifications, and symbol queries.
 
@@ -17,9 +17,9 @@ Key Components:
     It is responsible for constructing requests, sending them to the appropriate endpoints, and 
     handling responses.
   - Parameter Classes: These classes encapsulate various parameters required for different API requests:
-    - `AccountParams`: Handles parameters related to account-specific API requests.
-    - `OrderParams`: Represents parameters for order-related API operations.
-    - `WatchlistParams`: Manages parameters for watchlist-related API requests.
+    - `AccountPathParams`: Handles parameters related to account-specific API requests.
+    - `OrderPathParams`: Represents parameters for order-related API operations.
+    - `WatchlistPathParams`: Manages parameters for watchlist-related API requests.
     - `SymbolsParams`: Handles parameters for symbol-related API queries.
 
 Test Structure:
@@ -39,8 +39,8 @@ in your testing environment before running these tests.
 """
 import unittest
 from unittest.mock import patch, MagicMock
-from tradier_api import TradierApiController, Endpoints, AccountParams, OrderParams, \
-                        WatchlistParams, SymbolsParams
+from tradier_api import TradierApiController, Endpoints, AccountPathParams, OrderPathParams, \
+                        WatchlistPathParams, SymbolsParams
 
 from tradier_api._core_types import BaseURL
 
@@ -62,21 +62,21 @@ class TestMakeRequestWithParams(unittest.TestCase):
         # Prepare expected endpoint and parameter mappings
         symbols = SymbolsParams(symbols=["AAPL", "GOOGL", "MSFT"])
         test_cases = [
-            # AccountParams test cases
-            (Endpoints.GET_BALANCES, AccountParams(account_id="12345678"), "/v1/accounts/12345678/balances"),
-            (Endpoints.GET_POSITIONS, AccountParams(account_id="87654321"), "/v1/accounts/87654321/positions"),
-            (Endpoints.GET_HISTORY, AccountParams(account_id="12345678"), "/v1/accounts/12345678/history"),
+            # AccountPathParams test cases
+            (Endpoints.GET_BALANCES, AccountPathParams(account_id="12345678"), "/v1/accounts/12345678/balances"),
+            (Endpoints.GET_POSITIONS, AccountPathParams(account_id="87654321"), "/v1/accounts/87654321/positions"),
+            (Endpoints.GET_HISTORY, AccountPathParams(account_id="12345678"), "/v1/accounts/12345678/history"),
 
-            # OrderParams test cases
-            (Endpoints.GET_AN_ORDER, OrderParams(account_id="12345678", order_id="987654"), "/v1/accounts/12345678/orders/987654"),
-            (Endpoints.MODIFY_ORDER, OrderParams(account_id="87654321", order_id="123987"), "/v1/accounts/87654321/orders/123987"),
-            (Endpoints.CANCEL_ORDER, OrderParams(account_id="11223344", order_id="998877"), "/v1/accounts/11223344/orders/998877"),
+            # OrderPathParams test cases
+            (Endpoints.GET_AN_ORDER, OrderPathParams(account_id="12345678", order_id="987654"), "/v1/accounts/12345678/orders/987654"),
+            (Endpoints.MODIFY_ORDER, OrderPathParams(account_id="87654321", order_id="123987"), "/v1/accounts/87654321/orders/123987"),
+            (Endpoints.CANCEL_ORDER, OrderPathParams(account_id="11223344", order_id="998877"), "/v1/accounts/11223344/orders/998877"),
 
-            # WatchlistParams test cases
-            (Endpoints.GET_WATCHLIST, WatchlistParams(watchlist_id="watchlist1"), "/v1/watchlists/watchlist1"),
-            (Endpoints.DELETE_WATCHLIST_SYMBOL, WatchlistParams(watchlist_id="watchlist1", symbol="AAPL"), "/v1/watchlists/watchlist1/symbols/AAPL"),
-            (Endpoints.DELETE_WATCHLIST_SYMBOL, WatchlistParams(watchlist_id="watchlist2", symbol="GOOGL"), "/v1/watchlists/watchlist2/symbols/GOOGL"),
-            (Endpoints.ADD_WATCHLIST_SYMBOL, WatchlistParams(watchlist_id="watchlist3", symbol="MSFT"), "/v1/watchlists/watchlist3/symbols/MSFT"),
+            # WatchlistPathParams test cases
+            (Endpoints.GET_WATCHLIST, WatchlistPathParams(watchlist_id="watchlist1"), "/v1/watchlists/watchlist1"),
+            (Endpoints.DELETE_WATCHLIST_SYMBOL, WatchlistPathParams(watchlist_id="watchlist1", symbol="AAPL"), "/v1/watchlists/watchlist1/symbols/AAPL"),
+            (Endpoints.DELETE_WATCHLIST_SYMBOL, WatchlistPathParams(watchlist_id="watchlist2", symbol="GOOGL"), "/v1/watchlists/watchlist2/symbols/GOOGL"),
+            (Endpoints.ADD_WATCHLIST_SYMBOL, WatchlistPathParams(watchlist_id="watchlist3", symbol="MSFT"), "/v1/watchlists/watchlist3/symbols/MSFT"),
 
             # Additional generic endpoint tests without specific parameters
             (Endpoints.GET_QUOTES, None, "/v1/markets/quotes"),

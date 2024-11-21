@@ -7,24 +7,36 @@ class BaseParams:
         """
         return {k: v for k, v in self.__dict__.items() if v is not None}
 
-class AccountParams(BaseParams):
+#####################################################################################
+#####################################################################################
+
+class PathParams(BaseParams):
+    pass
+
+class AccountPathParams(PathParams):
     def __init__(self, account_id: str):
         self.account_id = account_id
 
-class OrderParams(BaseParams):
+class OrderPathParams(PathParams):
     def __init__(self, account_id: str, order_id: str):
         self.account_id = account_id
         self.order_id = order_id
 
-class WatchlistParams(BaseParams):
+class WatchlistPathParams(PathParams):
     def __init__(self, watchlist_id: str, symbol: Optional[str] = None):
         if watchlist_id is None or watchlist_id.strip() == "":
             raise ValueError("Watchlist ID is required but was not provided.")
         
         self.watchlist_id = watchlist_id
         self.symbol = symbol
-        
-class BaseParamWithNormalization(BaseParams):
+
+#####################################################################################
+#####################################################################################
+
+class QueryParams(BaseParams):
+    pass
+
+class BaseParamWithNormalization(QueryParams):
     def __init__(self, values: Union[List[str], str, None], key: str, required: bool = True):
         """
         Base class for parameter types that normalize list, string, or None inputs.
