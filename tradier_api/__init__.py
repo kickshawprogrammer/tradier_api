@@ -46,7 +46,7 @@ logger.addHandler(logging.NullHandler())
 logger.info(f"Initializing Tradier API: {__name__}")
 
 # Metadata
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 __author__ = "KickshawProgrammer"
 __email__ = "kickshawprogrammer@gmail.com"
 __license__ = "MIT"
