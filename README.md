@@ -1,6 +1,3 @@
-### `README.md`
----
-
 # Tradier API Python Library
 
 [![PyPI version](https://badge.fury.io/py/tradier-api.svg)](https://pypi.org/project/tradier-api/)

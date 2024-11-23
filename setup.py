@@ -19,8 +19,15 @@ setup(
     install_requires=[
         "requests>=2.32.3",
         "websockets>=14.1",
-        
     ],
+    extras_require={
+        "docs": [
+            "mkdocs",
+            "mkdocs-include-markdown-plugin",
+            "mkdocs[python]",
+            "ruamel.yaml",
+        ],
+    },
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",

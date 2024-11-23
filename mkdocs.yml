@@ -1,0 +1,101 @@
+site_name: Tradier API Documentation
+site_description: A Python library for the Tradier API
+site_author: Kickshaw Programmer
+
+theme:
+  name: readthedocs
+  features:
+  - navigation.tabs
+  - navigation.sections
+  - toc.integrate
+  - navigation.top
+  - search.suggest
+  - search.highlight
+  - content.tabs.link
+  - content.code.annotation
+  - content.code.copy
+  navigation:
+    depth: 3
+
+  language: en
+  palette:
+  - scheme: default
+    toggle:
+      icon: material/toggle-switch-off-outline
+      name: Switch to dark mode
+    primary: teal
+    accent: purple
+  - scheme: slate
+    toggle:
+      icon: material/toggle-switch
+      name: Switch to light mode
+    primary: teal
+    accent: lime
+
+plugins:
+  # - social
+- search
+- include-markdown
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_full_path: true
+
+extra:
+  social:
+  - icon: fontawesome/brands/github-alt
+    link: https://github.com/kickshawprogrammer/tradier_api.git
+
+markdown_extensions:
+- pymdownx.highlight:
+    anchor_linenums: true
+- pymdownx.inlinehilite
+- pymdownx.snippets
+- admonition
+- pymdownx.arithmatex:
+    generic: true
+- footnotes
+- pymdownx.details
+- pymdownx.superfences
+- pymdownx.mark
+- attr_list
+- pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:materialx.emoji.to_svg
+
+nav:
+- Home:
+  - Welcome: home/welcome.md
+  - Readme: home/readme.md
+  - License: home/license.md
+- Source Code:
+  - Tradier_api:
+    - _core_types.py: source_code/tradier_api/_core_types.md
+    - tradier_config.py: source_code/tradier_api/tradier_config.md
+    - tradier_controllers.py: source_code/tradier_api/tradier_controllers.md
+    - tradier_params.py: source_code/tradier_api/tradier_params.md
+    - tradier_streams.py: source_code/tradier_api/tradier_streams.md
+    - tradier_types.py: source_code/tradier_api/tradier_types.md
+  - Examples:
+    - _import_token.py: source_code/examples/_import_token.md
+    - account_streaming.py: source_code/examples/account_streaming.md
+    - get_user_profile.py: source_code/examples/get_user_profile.md
+    - http_streaming.py: source_code/examples/http_streaming.md
+    - plot_historical_data.py: source_code/examples/plot_historical_data.md
+    - websocket_streaming.py: source_code/examples/websocket_streaming.md
+  - Tests:
+    - api_error_handler_tests.py: source_code/tests/api_error_handler_tests.md
+    - base_params_tests.py: source_code/tests/base_params_tests.md
+    - endpoints_url_structure_tests.py: source_code/tests/endpoints_url_structure_tests.md
+    - make_request_with_params_tests.py: source_code/tests/make_request_with_params_tests.md
+    - throttle_handler_tests.py: source_code/tests/throttle_handler_tests.md
+    - tradier_api_controller_tests.py: source_code/tests/tradier_api_controller_tests.md
+    - tradier_base_streamer_tests.py: source_code/tests/tradier_base_streamer_tests.md
+    - tradier_config_tests.py: source_code/tests/tradier_config_tests.md
+    - tradier_http_streamer_tests.py: source_code/tests/tradier_http_streamer_tests.md
+    - tradier_stream_controller_tests.py: source_code/tests/tradier_stream_controller_tests.md
+    - tradier_websocket_streamer_tests.py: source_code/tests/tradier_websocket_streamer_tests.md
+copyright: |
+  Courtesy of: <a href="mailto:kickshawprogrammer@gmail.com">Kickshaw Programmer</a> - 
+  Feel free to use in any way you wish; but please, be kind and do good!
