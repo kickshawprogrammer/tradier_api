@@ -1,5 +1,5 @@
 """
-Module containing abstract base classes for API controllers.
+Module containing API controller classes for the Tradier API.
 
 This module provides abstract base classes for API controllers for the Tradier
 API. These controllers provide higher-level interfaces for interacting with the

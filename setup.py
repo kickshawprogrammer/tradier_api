@@ -25,6 +25,7 @@ setup(
             "mkdocs",
             "mkdocs-include-markdown-plugin",
             "mkdocs[python]",
+            "mkdocs-exclude",
             "ruamel.yaml",
         ],
     },

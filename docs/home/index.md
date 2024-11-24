@@ -9,9 +9,9 @@ Welcome to the **Tradier API** documentation. This resource is designed to guide
 
 Explore the following sections to learn more about `tradier_api`:
 
-- **[Welcome & Getting Started](home/welcome.md):** A quick-start guide to set up and use the library.
-- **[Project README](home/readme.md):** An overview of the repository, including its purpose and setup instructions.
-- **[License](home/license.md):** Information about the licensing of this project.
+- **[Welcome & Getting Started](welcome.md):** A quick-start guide to set up and use the library.
+- **[Project README](readme.md):** An overview of the repository, including its purpose and setup instructions.
+- **[License](license.md):** Information about the licensing of this project.
 
 ---
 
@@ -19,9 +19,9 @@ Explore the following sections to learn more about `tradier_api`:
 
 Directly access the source code documentation for each module and component:
 
-- **[API Source Code](source_code/tradier_api/index.md):** A breakdown of all classes and methods in the `tradier_api` library.
-- **[Examples](source_code/examples/index.md):** Ready-to-use example scripts demonstrating common use cases.
-- **[Tests](source_code/tests/index.md):** Test files showcasing how to verify functionality.
+- **[API Source Code](../source_code/tradier_api/index.md):** A breakdown of all classes and methods in the `tradier_api` library.
+- **[Examples](../source_code/examples/index.md):** Ready-to-use example scripts demonstrating common use cases.
+- **[Tests](../source_code/tests/index.md):** Test files showcasing how to verify functionality.
 
 ---
 

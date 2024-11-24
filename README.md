@@ -96,7 +96,7 @@ pytest tests/
 
 ## Class Hierarchy
 
-```
+<pre style="font-size: 0.7em; line-height: 1.4;">
 +--- TradierAPIException: Custom exception class for handling errors specific to the Tradier API.  
 |  
 +-- TradierConfig: Manages API configuration, including environment selection and headers.  
@@ -127,7 +127,7 @@ pytest tests/
     +-- Endpoints:                  Maps REST API endpoint paths to their corresponding operations.  
     +-- WebSocketEndpoints:         Enumerates WebSocket-specific endpoints for Tradier API streaming.  
     +-- ExchangeCode:               Defines exchange codes used for identifying market exchanges.  
-```
+</pre>
 ---
 
 ## License

@@ -1,5 +1,5 @@
 """
-_import_token.py
+Module to import _secrets.py and provide API tokens and account information.
 
 This module provides access to API tokens and account information for the Tradier API 
 examples, ensuring privacy and security by using a fallback placeholder value and 

@@ -1,5 +1,5 @@
 """
-tradier_base_streamer_tests.py
+Module for testing the `TradierBaseStreamer` class.
 
 This module contains unit tests for the `TradierBaseStreamer` class, which is the abstract base class
 for all streamers in the Tradier API library. It provides tests for the core functionality of the base

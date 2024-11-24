@@ -1,5 +1,5 @@
 """
-tradier_streams.py
+Module containing API streamer classes for the Tradier API.
 
 This module provides classes and functions for streaming data from the Tradier API, 
 including both HTTP and WebSocket streaming capabilities. It defines the necessary 

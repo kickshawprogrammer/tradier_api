@@ -1,3 +1,22 @@
+"""
+Module containing parameter classes for the Tradier API.
+
+This module provides classes for defining parameters that can be used with the
+Tradier API. These classes are used to define the parameters for API endpoints,
+and can be used to generate query strings or URL paths for API requests.
+
+The following classes are available in this module:
+
+- `BaseParams`: A base class for all parameter classes, providing a method for
+  converting the parameters to a dictionary.
+- `PathParams`: A base class for parameters that are used in URL paths.
+- `AccountPathParams`: Parameters for API endpoints that require an account ID.
+- `OrderPathParams`: Parameters for API endpoints that require an account ID and
+  order ID.
+- `WatchlistPathParams`: Parameters for API endpoints that require a watchlist ID
+  and optional symbol.
+
+"""
 from typing import Optional, Union, List, Dict, Any
 
 class BaseParams:
